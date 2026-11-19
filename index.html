@@ -48,63 +48,43 @@
             background-color: #f1f5f9;
             color: #1e293b;
         }
-
         .sidebar-gradient {
             background: linear-gradient(180deg, #072448 0%, #0a3161 55%, #061d3b 100%);
         }
-
         .login-hero-gradient {
             background: linear-gradient(135deg, #072448 0%, #0e498c 60%, #0b7a8c 100%);
         }
-
         .btn-primary-gradient {
             background: linear-gradient(90deg, #0e498c 0%, #14b6c4 100%);
         }
-
         .btn-primary-gradient:hover {
             background: linear-gradient(90deg, #0a3666 0%, #0e8a94 100%);
         }
-
         .nav-btn-active {
             background: linear-gradient(90deg, #0e498c 0%, #14b6c4 100%);
             color: #ffffff;
             border: 1px solid #5eead4;
             font-weight: 800;
         }
-
         .nav-btn-idle {
             color: #cbd5e1;
             border: 1px solid transparent;
         }
-
         .nav-btn-idle:hover {
             background: rgba(20, 182, 196, 0.14);
             color: #ffffff;
             border: 1px solid rgba(20, 182, 196, 0.30);
         }
-
         .topbar-accent {
             background: linear-gradient(90deg, #0e498c 0%, #14b6c4 50%, #0e498c 100%);
         }
-
         .logo-clean-crop {
             object-fit: contain;
         }
-
-        ::-webkit-scrollbar {
-            width: 7px;
-            height: 7px;
-        }
-        ::-webkit-scrollbar-track {
-            background: #f1f5f9;
-        }
-        ::-webkit-scrollbar-thumb {
-            background: #cbd5e1;
-            border-radius: 9999px;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background: #94a3b8;
-        }
+        ::-webkit-scrollbar { width: 7px; height: 7px; }
+        ::-webkit-scrollbar-track { background: #f1f5f9; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 9999px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
     </style>
 </head>
 <body class="antialiased selection:bg-brand-cyan/20 selection:text-brand-blue">
@@ -113,15 +93,17 @@
     <!-- PANTALLA DE LOGIN                                                      -->
     <!-- ====================================================================== -->
     <div id="login-view" class="min-h-screen flex flex-col lg:flex-row">
-        <!-- Panel Izquierdo Institucional -->
         <div class="lg:w-1/2 login-hero-gradient p-8 sm:p-12 lg:p-14 flex flex-col justify-between text-white">
             <div class="space-y-4">
                 <div class="bg-white border-2 border-brand-cyan rounded-2xl px-5 py-3 inline-flex items-center shadow-lg">
                     <img src="logo_horizontal_clean.png" alt="PymeSync" class="h-11 sm:h-12 w-auto logo-clean-crop">
                 </div>
-                <div>
+                <div class="flex flex-wrap items-center gap-2">
                     <span class="inline-block bg-brand-cyan/20 text-[#5eead4] border border-brand-cyan rounded-lg px-3 py-1.5 text-xs font-extrabold tracking-wide">
                         «TU TIENDITA, BIEN CHIDITA» · SaaS B2B
+                    </span>
+                    <span id="login-server-badge" class="inline-block bg-white/10 text-slate-200 border border-white/25 rounded-lg px-3 py-1.5 text-xs font-bold">
+                        Detectando servidor PHP local...
                     </span>
                 </div>
             </div>
@@ -131,7 +113,7 @@
                     El control total de tu negocio, sin complicaciones
                 </h1>
                 <p class="text-slate-200 text-base leading-relaxed">
-                    Controla ventas, inventario, precios, entradas, proveedores y reportes desde una interfaz simple, coherente y profesional.
+                    Controla ventas, inventario, precios, entradas, proveedores y reportes desde una interfaz simple, conectada a tu servidor PHP + SQLite local o en modo demo autónomo.
                 </p>
                 <div class="space-y-2.5 pt-2 text-sm font-semibold text-teal-50">
                     <div class="flex items-center gap-2.5">
@@ -144,7 +126,7 @@
                     </div>
                     <div class="flex items-center gap-2.5">
                         <i class="ph-bold ph-check-circle text-brand-cyan text-lg"></i>
-                        <span>Funciona localmente sin depender de internet</span>
+                        <span>Conecta GitHub Pages directo a tu servidor PHP local</span>
                     </div>
                 </div>
             </div>
@@ -154,7 +136,6 @@
             </div>
         </div>
 
-        <!-- Panel Derecho Formulario -->
         <div class="lg:w-1/2 bg-[#f1f5f9] p-6 sm:p-12 flex items-center justify-center">
             <div class="w-full max-w-md bg-white border border-[#dbe4f0] rounded-2xl p-8 sm:p-9 shadow-sm">
                 <div class="mb-5">
@@ -199,12 +180,17 @@
                     </button>
                 </form>
 
-                <div class="mt-5 pt-4 border-t border-slate-100 text-center">
+                <div class="mt-5 pt-4 border-t border-slate-100 flex items-center justify-between text-xs">
                     <a href="pymesync_canvas.html" target="_blank"
-                       class="inline-flex items-center gap-1.5 text-xs font-bold text-brand-cyanDark hover:text-brand-blue transition">
+                       class="inline-flex items-center gap-1.5 font-bold text-brand-cyanDark hover:text-brand-blue transition">
                         <i class="ph-bold ph-presentation-chart"></i>
-                        <span>Ver Business Model Canvas</span>
+                        <span>Business Model Canvas</span>
                     </a>
+                    <button id="login-reconnect-btn" type="button"
+                            class="inline-flex items-center gap-1 font-bold text-brand-blue hover:text-brand-cyanDark cursor-pointer">
+                        <i class="ph-bold ph-plugs-connected"></i>
+                        <span>Reconectar PHP</span>
+                    </button>
                 </div>
             </div>
         </div>
@@ -214,15 +200,11 @@
     <!-- APLICACIÓN PRINCIPAL                                                   -->
     <!-- ====================================================================== -->
     <div id="app-view" class="hidden min-h-screen flex">
-
-        <!-- Overlay móvil para sidebar -->
         <div id="mobile-overlay" class="fixed inset-0 bg-slate-900/50 z-30 hidden lg:hidden"></div>
 
-        <!-- Sidebar Corporativo -->
         <aside id="sidebar"
                class="fixed lg:static inset-y-0 left-0 z-40 w-[264px] shrink-0 sidebar-gradient border-r border-brand-blue flex flex-col p-4 transition-transform duration-200 -translate-x-full lg:translate-x-0">
 
-            <!-- Tarjeta Logo Horizontal Oficial -->
             <div class="bg-white border-2 border-brand-cyan rounded-xl px-3 py-2.5 text-center shadow-sm">
                 <img src="logo_horizontal_clean.png" alt="PymeSync" class="h-9 mx-auto w-auto logo-clean-crop">
                 <p class="text-[11px] font-extrabold text-brand-cyanDark tracking-wide mt-1">
@@ -234,7 +216,6 @@
                 Plataforma de Gestión Comercial
             </div>
 
-            <!-- Menú de 9 Módulos -->
             <nav id="sidebar-nav" class="flex-1 space-y-1.5 overflow-y-auto pr-0.5">
                 <button data-page="dashboard" class="nav-item w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-[13.5px] font-semibold transition cursor-pointer text-left">
                     <i class="ph-bold ph-squares-four text-lg"></i><span>Inicio</span>
@@ -265,14 +246,18 @@
                 </button>
             </nav>
 
-            <!-- Tarjeta de Estado Inferior + Cerrar Sesión -->
             <div class="mt-4 space-y-2">
                 <div class="bg-brand-blue/35 border border-brand-cyan/30 rounded-xl px-3 py-2.5">
-                    <div class="text-[11px] font-extrabold text-[#5eead4] flex items-center gap-1.5">
+                    <div id="sidebar-conn-status" class="text-[11px] font-extrabold text-[#5eead4] flex items-center gap-1.5">
                         <span>●</span>
-                        <span>Modo Local Activo (Sin Internet)</span>
+                        <span>Conectando...</span>
                     </div>
-                    <div class="text-[11px] text-slate-400 mt-0.5">PymeSync SaaS · Equipo 3 UAA</div>
+                    <div class="text-[11px] text-slate-400 mt-0.5 flex items-center justify-between gap-2">
+                        <span>PymeSync SaaS</span>
+                        <button id="sidebar-reconnect-btn" type="button" class="text-[10px] font-bold text-[#5eead4] underline hover:text-white cursor-pointer">
+                            Reconectar PHP
+                        </button>
+                    </div>
                 </div>
                 <button id="logout-btn"
                         class="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-xl text-xs font-bold text-slate-300 hover:text-white hover:bg-white/10 border border-white/10 transition cursor-pointer">
@@ -282,10 +267,7 @@
             </div>
         </aside>
 
-        <!-- Contenido Principal -->
         <div class="flex-1 flex flex-col min-w-0">
-
-            <!-- Topbar -->
             <header class="bg-white border-b-2 border-slate-200 sticky top-0 z-20">
                 <div class="h-1 topbar-accent"></div>
                 <div class="px-4 sm:px-7 py-3 flex items-center justify-between gap-3">
@@ -315,23 +297,20 @@
                             </div>
                             <div class="leading-tight hidden sm:block">
                                 <div id="topbar-user-name" class="text-[13.5px] font-extrabold text-brand-blue">Administrador</div>
-                                <div class="text-[11px] font-bold text-brand-cyanDark">Administrador · PymeSync</div>
+                                <div id="topbar-user-role" class="text-[11px] font-bold text-brand-cyanDark">Administrador · PymeSync</div>
                             </div>
                         </div>
                     </div>
                 </div>
             </header>
 
-            <!-- Vistas de Páginas -->
             <main class="flex-1 p-4 sm:p-7 overflow-y-auto">
                 <div id="page-container" class="max-w-[1400px] mx-auto"></div>
             </main>
         </div>
     </div>
 
-    <!-- ====================================================================== -->
-    <!-- MODAL GENÉRICO (PRODUCTOS / PROVEEDORES / USUARIOS)                    -->
-    <!-- ====================================================================== -->
+    <!-- Modal Genérico -->
     <div id="modal-backdrop" class="fixed inset-0 bg-slate-900/50 backdrop-blur-[1px] z-50 hidden items-center justify-center p-4">
         <div class="bg-white border border-[#dbe4f0] rounded-2xl w-full max-w-md shadow-2xl overflow-hidden">
             <div class="h-1 topbar-accent"></div>
@@ -357,20 +336,20 @@
         </div>
     </div>
 
-    <!-- ====================================================================== -->
-    <!-- TOAST DE NOTIFICACIONES                                                -->
-    <!-- ====================================================================== -->
+    <!-- Toast Container -->
     <div id="toast-container" class="fixed bottom-5 right-5 z-50 space-y-2 max-w-sm"></div>
 
-    <!-- ====================================================================== -->
-    <!-- LÓGICA DE APLICACIÓN PYMESYNC                                          -->
-    <!-- ====================================================================== -->
     <script>
         const STORAGE_KEY = 'pymesync_store_v1';
         const SESSION_KEY = 'pymesync_session_v1';
+        const SERVER_URL_KEY = 'pymesync_php_server_url';
+
+        let phpApiUrl = null;
+        let configuredServerUrl = localStorage.getItem(SERVER_URL_KEY) || 'http://localhost:8000/api.php';
 
         function formatDateTime(dateObj) {
             const d = new Date(dateObj);
+            if (isNaN(d.getTime())) return String(dateObj ?? '');
             const pad = n => String(n).padStart(2, '0');
             return `${pad(d.getDate())}/${pad(d.getMonth() + 1)}/${d.getFullYear()} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
         }
@@ -436,7 +415,7 @@
             };
         }
 
-        function loadState() {
+        function loadLocalState() {
             try {
                 const raw = localStorage.getItem(STORAGE_KEY);
                 if (raw) {
@@ -445,23 +424,19 @@
                         return parsed;
                     }
                 }
-            } catch (e) {
-                console.warn('Error leyendo localStorage, usando datos demo', e);
-            }
+            } catch (e) {}
             const def = buildDefaultState();
-            saveState(def);
+            saveLocalState(def);
             return def;
         }
 
-        function saveState(stateObj) {
+        function saveLocalState(stateObj) {
             try {
                 localStorage.setItem(STORAGE_KEY, JSON.stringify(stateObj));
-            } catch (e) {
-                console.warn('No se pudo guardar en localStorage', e);
-            }
+            } catch (e) {}
         }
 
-        let state = loadState();
+        let state = loadLocalState();
         let currentPage = 'dashboard';
         let cart = [];
         let selectedCartIndex = -1;
@@ -480,7 +455,75 @@
             configuracion: { title: 'Configuración', icon: 'ph-sliders-horizontal' }
         };
 
-        // Toast helper
+        function updateConnectionBadges() {
+            const loginBadge = document.getElementById('login-server-badge');
+            const sidebarStatus = document.getElementById('sidebar-conn-status');
+            if (phpApiUrl) {
+                const eng = state?.server_info?.engine || 'PHP + SQLite';
+                loginBadge.className = 'inline-block bg-emerald-400/20 text-[#5eead4] border border-emerald-400/50 rounded-lg px-3 py-1.5 text-xs font-extrabold';
+                loginBadge.textContent = `● ${eng} Conectado`;
+                sidebarStatus.className = 'text-[11px] font-extrabold text-[#5eead4] flex items-center gap-1.5';
+                sidebarStatus.innerHTML = `<span>●</span><span>Servidor PHP + SQLite Conectado</span>`;
+            } else {
+                loginBadge.className = 'inline-block bg-white/10 text-slate-200 border border-white/25 rounded-lg px-3 py-1.5 text-xs font-bold';
+                loginBadge.textContent = 'Modo Local Navegador (Sin Servidor PHP)';
+                sidebarStatus.className = 'text-[11px] font-extrabold text-amber-300 flex items-center gap-1.5';
+                sidebarStatus.innerHTML = `<span>●</span><span>Modo Demo Local (Offline)</span>`;
+            }
+        }
+
+        async function probePhpServer(customUrl = null) {
+            const candidates = customUrl
+                ? [customUrl]
+                : (window.location.protocol.startsWith('http') && !window.location.hostname.endsWith('github.io')
+                    ? ['./api.php', configuredServerUrl]
+                    : [configuredServerUrl]);
+
+            for (const url of candidates) {
+                try {
+                    const controller = new AbortController();
+                    const timer = setTimeout(() => controller.abort(), 1600);
+                    const resp = await fetch(`${url}?action=ping`, { signal: controller.signal });
+                    clearTimeout(timer);
+                    if (resp.ok) {
+                        const data = await resp.json();
+                        if (data && data.ok && data.state) {
+                            phpApiUrl = url;
+                            state = data.state;
+                            updateConnectionBadges();
+                            return true;
+                        }
+                    }
+                } catch (e) {}
+            }
+            phpApiUrl = null;
+            state = loadLocalState();
+            updateConnectionBadges();
+            return false;
+        }
+
+        async function apiCall(action, payload = null) {
+            if (!phpApiUrl) {
+                throw new Error('NO_PHP_SERVER');
+            }
+            const opts = payload === null
+                ? { method: 'GET' }
+                : {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                };
+            const resp = await fetch(`${phpApiUrl}?action=${encodeURIComponent(action)}`, opts);
+            const data = await resp.json();
+            if (!resp.ok || !data.ok) {
+                throw new Error(data.error || 'Error en el servidor PHP');
+            }
+            if (data.state) {
+                state = data.state;
+            }
+            return data;
+        }
+
         function showToast(title, message, type = 'success') {
             const container = document.getElementById('toast-container');
             const colors = {
@@ -508,7 +551,6 @@
             }, 3400);
         }
 
-        // Modal helper
         let modalOnSubmit = null;
 
         function openModal(title, fieldsHtml, onSubmit) {
@@ -532,12 +574,11 @@
         document.getElementById('modal-backdrop').addEventListener('click', (e) => {
             if (e.target.id === 'modal-backdrop') closeModal();
         });
-        document.getElementById('modal-form').addEventListener('submit', (e) => {
+        document.getElementById('modal-form').addEventListener('submit', async (e) => {
             e.preventDefault();
-            if (modalOnSubmit) modalOnSubmit();
+            if (modalOnSubmit) await modalOnSubmit();
         });
 
-        // Helpers de UI
         function sectionHeaderHtml(iconClass, title, subtitle, actionHtml = '') {
             return `
                 <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-5">
@@ -557,21 +598,9 @@
 
         function statCardHtml(title, value, detail, iconClass, variant = 'blue') {
             const styles = {
-                blue: {
-                    border: 'border-t-4 border-t-brand-blue border-[#dbe4f0]',
-                    valColor: 'text-brand-blue',
-                    iconBg: 'bg-brand-blueLight text-brand-blue'
-                },
-                cyan: {
-                    border: 'border-t-4 border-t-brand-cyan border-[#dbe4f0]',
-                    valColor: 'text-brand-cyanDark',
-                    iconBg: 'bg-brand-cyanLight text-brand-cyanDark'
-                },
-                alert: {
-                    border: 'border-t-4 border-t-amber-500 border-amber-200',
-                    valColor: 'text-amber-600',
-                    iconBg: 'bg-amber-100 text-amber-600'
-                }
+                blue: { border: 'border-t-4 border-t-brand-blue border-[#dbe4f0]', valColor: 'text-brand-blue', iconBg: 'bg-brand-blueLight text-brand-blue' },
+                cyan: { border: 'border-t-4 border-t-brand-cyan border-[#dbe4f0]', valColor: 'text-brand-cyanDark', iconBg: 'bg-brand-cyanLight text-brand-cyanDark' },
+                alert: { border: 'border-t-4 border-t-amber-500 border-amber-200', valColor: 'text-amber-600', iconBg: 'bg-amber-100 text-amber-600' }
             };
             const s = styles[variant] || styles.blue;
             return `
@@ -606,16 +635,11 @@
         }
 
         function getProduct(id) {
-            return state.products.find(p => p.id === Number(id)) || null;
+            return state.products.find(p => Number(p.id) === Number(id)) || null;
         }
 
-        // ======================================================================
-        // RENDERIZADO DE LAS 9 PÁGINAS
-        // ======================================================================
         function renderPage(page) {
             currentPage = page;
-
-            // Actualizar navegación activa y Topbar
             document.querySelectorAll('.nav-item').forEach(btn => {
                 const active = btn.dataset.page === page;
                 btn.classList.toggle('nav-btn-active', active);
@@ -627,7 +651,6 @@
             document.getElementById('topbar-icon').innerHTML = `<i class="ph-bold ${meta.icon} text-lg"></i>`;
 
             const container = document.getElementById('page-container');
-
             if (page === 'dashboard') renderDashboard(container);
             else if (page === 'ventas') renderVentas(container);
             else if (page === 'productos') renderProductos(container);
@@ -639,12 +662,11 @@
             else if (page === 'configuracion') renderConfiguracion(container);
         }
 
-        // 1. INICIO (DASHBOARD)
         function renderDashboard(container) {
             const todayStr = new Date().toDateString();
             const todaySales = state.sales.filter(s => new Date(s.fecha).toDateString() === todayStr);
-            const totalToday = todaySales.reduce((acc, s) => acc + s.total, 0);
-            const lowProducts = state.products.filter(p => p.stock <= p.minimo);
+            const totalToday = todaySales.reduce((acc, s) => acc + Number(s.total), 0);
+            const lowProducts = state.products.filter(p => Number(p.stock) <= Number(p.minimo));
             const recentSales = [...state.sales].slice(-6).reverse();
 
             container.innerHTML = `
@@ -719,14 +741,13 @@
             `;
         }
 
-        // 2. VENTAS (PUNTO DE VENTA)
         function renderVentas(container) {
             const firstProd = state.products[0];
             const selectedId = document.getElementById('pos-product')?.value || (firstProd ? firstProd.id : '');
             const activeProd = getProduct(selectedId) || firstProd;
             const totalCart = cart.reduce((acc, item) => {
                 const p = getProduct(item.product_id);
-                return acc + (p ? p.precio * item.cantidad : 0);
+                return acc + (p ? Number(p.precio) * item.cantidad : 0);
             }, 0);
 
             container.innerHTML = `
@@ -739,7 +760,7 @@
                             <select id="pos-product"
                                     class="w-full bg-slate-50 border-[1.5px] border-slate-300 rounded-xl px-3 py-2.5 text-sm font-semibold text-slate-900 focus:outline-none focus:border-brand-cyan focus:bg-white">
                                 ${state.products.map(p => `
-                                    <option value="${p.id}" ${activeProd && p.id === activeProd.id ? 'selected' : ''}>
+                                    <option value="${p.id}" ${activeProd && Number(p.id) === Number(activeProd.id) ? 'selected' : ''}>
                                         ${escapeHtml(p.nombre)} - ${formatMoney(p.precio)}
                                     </option>
                                 `).join('')}
@@ -783,7 +804,7 @@
                                 ${cart.length ? cart.map((item, idx) => {
                                     const p = getProduct(item.product_id);
                                     if (!p) return '';
-                                    const sub = p.precio * item.cantidad;
+                                    const sub = Number(p.precio) * item.cantidad;
                                     const isSel = idx === selectedCartIndex;
                                     return `
                                         <tr data-cart-idx="${idx}" class="cart-row cursor-pointer transition ${isSel ? 'bg-brand-cyanLight font-bold text-brand-blue' : 'odd:bg-white even:bg-slate-50/70 hover:bg-brand-cyanLight/60'}">
@@ -833,10 +854,7 @@
 
             function updateStockIndicator() {
                 const p = getProduct(selectEl.value);
-                if (!p) {
-                    badgeEl.textContent = 'Stock: 0';
-                    return;
-                }
+                if (!p) { badgeEl.textContent = 'Stock: 0'; return; }
                 badgeEl.textContent = `Stock: ${p.stock}`;
                 qtyEl.max = Math.max(p.stock, 1);
                 if (p.stock <= p.minimo) {
@@ -853,7 +871,7 @@
                 const p = getProduct(selectEl.value);
                 if (!p) return;
                 const qty = Math.max(1, parseInt(qtyEl.value, 10) || 1);
-                const existing = cart.find(i => i.product_id === p.id);
+                const existing = cart.find(i => Number(i.product_id) === Number(p.id));
                 const currentQty = existing ? existing.cantidad : 0;
 
                 if (currentQty + qty > p.stock) {
@@ -861,7 +879,7 @@
                     return;
                 }
                 if (existing) existing.cantidad += qty;
-                else cart.push({ product_id: p.id, cantidad: qty });
+                else cart.push({ product_id: Number(p.id), cantidad: qty });
 
                 renderVentas(container);
             });
@@ -876,8 +894,7 @@
 
             document.querySelectorAll('.remove-inline-btn').forEach(btn => {
                 btn.addEventListener('click', () => {
-                    const idx = Number(btn.dataset.removeIdx);
-                    cart.splice(idx, 1);
+                    cart.splice(Number(btn.dataset.removeIdx), 1);
                     selectedCartIndex = -1;
                     renderVentas(container);
                 });
@@ -893,22 +910,29 @@
                 }
             });
 
-            document.getElementById('pos-finish-btn').addEventListener('click', () => {
+            document.getElementById('pos-finish-btn').addEventListener('click', async () => {
                 if (!cart.length) {
                     showToast('Venta vacía', 'Agrega al menos un producto al carrito.', 'warning');
                     return;
                 }
 
+                if (phpApiUrl) {
+                    try {
+                        const res = await apiCall('sale_create', { cart });
+                        cart = [];
+                        selectedCartIndex = -1;
+                        showToast('Venta guardada en SQLite', `Folio ${res.folio} completado. Total cobrado: ${formatMoney(res.total)}`, 'success');
+                        renderVentas(container);
+                    } catch (err) {
+                        showToast('Error al registrar venta', err.message, 'error');
+                    }
+                    return;
+                }
+
                 for (const item of cart) {
                     const p = getProduct(item.product_id);
-                    if (!p) {
-                        showToast('Error', 'Producto no encontrado.', 'error');
-                        return;
-                    }
-                    if (item.cantidad > p.stock) {
-                        showToast('Stock insuficiente', `Stock insuficiente para ${p.nombre}.`, 'warning');
-                        return;
-                    }
+                    if (!p) { showToast('Error', 'Producto no encontrado.', 'error'); return; }
+                    if (item.cantidad > p.stock) { showToast('Stock insuficiente', `Stock insuficiente para ${p.nombre}.`, 'warning'); return; }
                 }
 
                 let total = 0;
@@ -921,33 +945,19 @@
                     p.stock -= item.cantidad;
                     total += p.precio * item.cantidad;
                     units += item.cantidad;
-
-                    state.movements.unshift({
-                        fecha: nowFmt,
-                        tipo: 'Venta',
-                        producto: p.nombre,
-                        cantidad: -item.cantidad,
-                        detalle: 'Venta registrada'
-                    });
+                    state.movements.unshift({ fecha: nowFmt, tipo: 'Venta', producto: p.nombre, cantidad: -item.cantidad, detalle: 'Venta registrada' });
                 }
 
                 const folio = `V-${1000 + state.sales.length + 1}`;
-                state.sales.push({
-                    folio,
-                    fecha: nowIso,
-                    productos: units,
-                    total
-                });
-
-                saveState(state);
+                state.sales.push({ folio, fecha: nowIso, productos: units, total });
+                saveLocalState(state);
                 cart = [];
                 selectedCartIndex = -1;
-                showToast('Venta registrada', `Folio ${folio} completado. Total cobrado: ${formatMoney(total)}`, 'success');
+                showToast('Venta registrada (Local)', `Folio ${folio} completado. Total cobrado: ${formatMoney(total)}`, 'success');
                 renderVentas(container);
             });
         }
 
-        // 3. PRODUCTOS
         function openProductModal(product = null) {
             const isEdit = Boolean(product);
             const html = `
@@ -992,13 +1002,11 @@
                 </div>
             `;
 
-            openModal(isEdit ? 'Editar Producto · PymeSync' : 'Nuevo Producto · PymeSync', html, () => {
+            openModal(isEdit ? 'Editar Producto · PymeSync' : 'Nuevo Producto · PymeSync', html, async () => {
                 const nombre = document.getElementById('m-nombre').value.trim();
-                if (!nombre) {
-                    showToast('Datos incompletos', 'Ingresa el nombre del producto.', 'warning');
-                    return;
-                }
+                if (!nombre) { showToast('Datos incompletos', 'Ingresa el nombre del producto.', 'warning'); return; }
                 const payload = {
+                    id: isEdit ? Number(product.id) : 0,
                     codigo: document.getElementById('m-codigo').value.trim(),
                     nombre,
                     categoria: document.getElementById('m-categoria').value.trim() || 'General',
@@ -1008,28 +1016,33 @@
                     minimo: parseInt(document.getElementById('m-minimo').value, 10) || 0
                 };
 
+                if (phpApiUrl) {
+                    try {
+                        await apiCall('product_save', payload);
+                        closeModal();
+                        showToast(isEdit ? 'Producto actualizado' : 'Producto agregado', `${payload.nombre} guardado en SQLite.`);
+                        renderPage('productos');
+                    } catch (err) {
+                        showToast('Error', err.message, 'error');
+                    }
+                    return;
+                }
+
                 if (isEdit) {
                     Object.assign(product, payload);
                     showToast('Producto actualizado', `${payload.nombre} guardado correctamente.`);
                 } else {
                     const nextId = state.products.reduce((max, p) => Math.max(max, p.id), 0) + 1;
-                    state.products.push({ id: nextId, ...payload });
+                    state.products.push({ ...payload, id: nextId });
                     showToast('Producto agregado', `${payload.nombre} se añadió al catálogo.`);
                 }
-                saveState(state);
+                saveLocalState(state);
                 closeModal();
                 renderPage('productos');
             });
         }
 
         function renderProductos(container) {
-            const q = productSearchText.trim().toLowerCase();
-            const filtered = state.products.filter(p =>
-                p.nombre.toLowerCase().includes(q) ||
-                p.codigo.toLowerCase().includes(q) ||
-                p.categoria.toLowerCase().includes(q)
-            );
-
             const addBtnHtml = `
                 <button id="prod-add-btn" class="btn-primary-gradient text-white rounded-xl px-4 py-2.5 text-sm font-bold flex items-center gap-2 transition cursor-pointer">
                     <i class="ph-bold ph-plus"></i><span>Agregar producto</span>
@@ -1082,8 +1095,8 @@
                 );
                 const tbody = document.getElementById('prod-tbody');
                 tbody.innerHTML = list.length ? list.map(p => {
-                    const isSel = p.id === selectedProductId;
-                    const lowStock = p.stock <= p.minimo;
+                    const isSel = Number(p.id) === Number(selectedProductId);
+                    const lowStock = Number(p.stock) <= Number(p.minimo);
                     return `
                         <tr data-prod-id="${p.id}" class="prod-row cursor-pointer transition ${isSel ? 'bg-brand-cyanLight font-bold text-brand-blue' : 'odd:bg-white even:bg-slate-50/70 hover:bg-brand-cyanLight/60'}">
                             <td class="px-4 py-2.5 font-mono text-xs text-slate-600">${escapeHtml(p.codigo)}</td>
@@ -1112,7 +1125,6 @@
             }
 
             paintRows();
-
             document.getElementById('prod-search').addEventListener('input', (e) => {
                 productSearchText = e.target.value;
                 paintRows();
@@ -1120,15 +1132,11 @@
             document.getElementById('prod-add-btn').addEventListener('click', () => openProductModal(null));
             document.getElementById('prod-edit-btn').addEventListener('click', () => {
                 const p = getProduct(selectedProductId);
-                if (!p) {
-                    showToast('Selección requerida', 'Selecciona un producto de la tabla para editarlo.', 'warning');
-                    return;
-                }
+                if (!p) { showToast('Selección requerida', 'Selecciona un producto de la tabla para editarlo.', 'warning'); return; }
                 openProductModal(p);
             });
         }
 
-        // 4. INVENTARIO
         function renderInventario(container) {
             container.innerHTML = `
                 ${sectionHeaderHtml('ph-clipboard-text', 'Control de Inventario', 'Consulta niveles de stock y registra entradas de mercancía')}
@@ -1190,26 +1198,31 @@
                 </div>
             `;
 
-            document.getElementById('inv-add-btn').addEventListener('click', () => {
-                const p = getProduct(document.getElementById('inv-product').value);
+            document.getElementById('inv-add-btn').addEventListener('click', async () => {
+                const productId = Number(document.getElementById('inv-product').value);
                 const qty = Math.max(1, parseInt(document.getElementById('inv-qty').value, 10) || 1);
+                const p = getProduct(productId);
                 if (!p) return;
 
+                if (phpApiUrl) {
+                    try {
+                        await apiCall('stock_add', { product_id: productId, cantidad: qty });
+                        showToast('Inventario actualizado en SQLite', `Se registraron +${qty} unidades de ${p.nombre}.`, 'success');
+                        renderInventario(container);
+                    } catch (err) {
+                        showToast('Error', err.message, 'error');
+                    }
+                    return;
+                }
+
                 p.stock += qty;
-                state.movements.unshift({
-                    fecha: formatDateTime(new Date()),
-                    tipo: 'Entrada',
-                    producto: p.nombre,
-                    cantidad: qty,
-                    detalle: 'Entrada de inventario'
-                });
-                saveState(state);
+                state.movements.unshift({ fecha: formatDateTime(new Date()), tipo: 'Entrada', producto: p.nombre, cantidad: qty, detalle: 'Entrada de inventario' });
+                saveLocalState(state);
                 showToast('Inventario actualizado', `Se registraron +${qty} unidades de ${p.nombre}.`, 'success');
                 renderInventario(container);
             });
         }
 
-        // 5. MOVIMIENTOS
         function renderMovimientos(container) {
             container.innerHTML = `
                 ${sectionHeaderHtml('ph-arrows-clockwise', 'Movimientos de Mercancía', 'Historial sincronizado de entradas, ventas y ajustes de inventario')}
@@ -1245,7 +1258,6 @@
             `;
         }
 
-        // 6. PROVEEDORES
         function renderProveedores(container) {
             const addBtn = `
                 <button id="prov-add-btn" class="btn-primary-gradient text-white rounded-xl px-4 py-2.5 text-sm font-bold flex items-center gap-2 transition cursor-pointer">
@@ -1300,19 +1312,28 @@
                         <label class="block text-xs font-bold text-slate-600 mb-1">Productos que surte</label>
                         <input id="p-productos" type="text" placeholder="Bebidas, lácteos, etc." class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-sm">
                     </div>
-                `, () => {
+                `, async () => {
                     const nombre = document.getElementById('p-nombre').value.trim();
-                    if (!nombre) {
-                        showToast('Datos incompletos', 'Ingresa el nombre del proveedor.', 'warning');
-                        return;
-                    }
-                    state.providers.push({
+                    if (!nombre) { showToast('Datos incompletos', 'Ingresa el nombre del proveedor.', 'warning'); return; }
+                    const payload = {
                         nombre,
                         contacto: document.getElementById('p-contacto').value.trim(),
                         telefono: document.getElementById('p-telefono').value.trim(),
                         productos: document.getElementById('p-productos').value.trim()
-                    });
-                    saveState(state);
+                    };
+                    if (phpApiUrl) {
+                        try {
+                            await apiCall('provider_add', payload);
+                            closeModal();
+                            showToast('Proveedor registrado en SQLite', `${nombre} agregado al directorio.`);
+                            renderProveedores(container);
+                        } catch (err) {
+                            showToast('Error', err.message, 'error');
+                        }
+                        return;
+                    }
+                    state.providers.push(payload);
+                    saveLocalState(state);
                     closeModal();
                     showToast('Proveedor registrado', `${nombre} agregado al directorio.`);
                     renderProveedores(container);
@@ -1320,12 +1341,11 @@
             });
         }
 
-        // 7. REPORTES
         function renderReportes(container) {
-            const totalIncome = state.sales.reduce((acc, s) => acc + s.total, 0);
+            const totalIncome = state.sales.reduce((acc, s) => acc + Number(s.total), 0);
             const salesCount = state.sales.length;
             const avgTicket = salesCount ? totalIncome / salesCount : 0;
-            const invValue = state.products.reduce((acc, p) => acc + (p.costo * p.stock), 0);
+            const invValue = state.products.reduce((acc, p) => acc + (Number(p.costo) * Number(p.stock)), 0);
             const allSales = [...state.sales].reverse();
 
             container.innerHTML = `
@@ -1365,7 +1385,6 @@
             `;
         }
 
-        // 8. ADMINISTRACIÓN DE USUARIOS
         function renderAdmin(container) {
             const addBtn = `
                 <button id="usr-add-btn" class="btn-primary-gradient text-white rounded-xl px-4 py-2.5 text-sm font-bold flex items-center gap-2 transition cursor-pointer">
@@ -1424,119 +1443,177 @@
                             <option value="Encargado">Encargado</option>
                         </select>
                     </div>
-                `, () => {
+                `, async () => {
                     const nombre = document.getElementById('u-nombre').value.trim();
                     const usuario = document.getElementById('u-usuario').value.trim();
-                    const pass = document.getElementById('u-pass').value;
-                    if (!nombre || !usuario || !pass) {
-                        showToast('Datos incompletos', 'Completa todos los datos del usuario.', 'warning');
+                    const password = document.getElementById('u-pass').value;
+                    const rol = document.getElementById('u-rol').value;
+                    if (!nombre || !usuario || !password) { showToast('Datos incompletos', 'Completa todos los datos del usuario.', 'warning'); return; }
+
+                    if (phpApiUrl) {
+                        try {
+                            await apiCall('user_add', { nombre, usuario, password, rol });
+                            closeModal();
+                            showToast('Usuario registrado en SQLite', `${nombre} (${usuario}) guardado como ${rol}.`);
+                            renderAdmin(container);
+                        } catch (err) {
+                            showToast('Error', err.message, 'error');
+                        }
                         return;
                     }
-                    state.users.push({
-                        nombre,
-                        usuario,
-                        rol: document.getElementById('u-rol').value,
-                        estado: 'Activo'
-                    });
-                    saveState(state);
+
+                    state.users.push({ nombre, usuario, rol, estado: 'Activo' });
+                    saveLocalState(state);
                     closeModal();
-                    showToast('Usuario agregado', `${nombre} (${usuario}) registrado como ${document.getElementById('u-rol').value}.`);
+                    showToast('Usuario agregado', `${nombre} (${usuario}) registrado como ${rol}.`);
                     renderAdmin(container);
                 });
             });
         }
 
-        // 9. CONFIGURACIÓN
         function renderConfiguracion(container) {
             const cfg = state.config || buildDefaultState().config;
             container.innerHTML = `
-                ${sectionHeaderHtml('ph-sliders-horizontal', 'Configuración del Negocio', 'Datos generales de tu tienda y preferencias de PymeSync')}
+                ${sectionHeaderHtml('ph-sliders-horizontal', 'Configuración del Negocio', 'Datos generales de tu tienda y conexión al servidor PHP local')}
 
-                <div class="bg-white border border-[#dbe4f0] rounded-2xl p-6 sm:p-7 shadow-xs max-w-2xl">
-                    <form id="cfg-form" class="space-y-4">
-                        <div class="pb-3 border-b border-slate-100 flex items-center justify-between">
-                            <div>
-                                <div class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Identidad corporativa</div>
-                                <img src="logo_horizontal_clean.png" alt="PymeSync" class="h-10 w-auto logo-clean-crop">
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
+                    <div class="lg:col-span-2 bg-white border border-[#dbe4f0] rounded-2xl p-6 sm:p-7 shadow-xs">
+                        <form id="cfg-form" class="space-y-4">
+                            <div class="pb-3 border-b border-slate-100 flex items-center justify-between flex-wrap gap-2">
+                                <div>
+                                    <div class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Identidad corporativa</div>
+                                    <img src="logo_horizontal_clean.png" alt="PymeSync" class="h-10 w-auto logo-clean-crop">
+                                </div>
+                                <span class="bg-brand-cyanLight text-brand-cyanDark border border-teal-200 rounded-lg px-3 py-1 text-xs font-extrabold">
+                                    «Tu tiendita, bien chidita»
+                                </span>
                             </div>
-                            <span class="bg-brand-cyanLight text-brand-cyanDark border border-teal-200 rounded-lg px-3 py-1 text-xs font-extrabold">
-                                «Tu tiendita, bien chidita»
-                            </span>
-                        </div>
 
+                            <div>
+                                <label class="block text-xs font-bold text-slate-600 mb-1">Nombre de la tienda</label>
+                                <input id="cfg-store" type="text" value="${escapeHtml(cfg.storeName)}"
+                                       class="w-full bg-slate-50 border-[1.5px] border-slate-300 rounded-xl px-3.5 py-2.5 text-sm font-semibold focus:outline-none focus:border-brand-cyan focus:bg-white">
+                            </div>
+
+                            <div>
+                                <label class="block text-xs font-bold text-slate-600 mb-1">Propietario</label>
+                                <input id="cfg-owner" type="text" value="${escapeHtml(cfg.owner)}"
+                                       class="w-full bg-slate-50 border-[1.5px] border-slate-300 rounded-xl px-3.5 py-2.5 text-sm font-semibold focus:outline-none focus:border-brand-cyan focus:bg-white">
+                            </div>
+
+                            <div>
+                                <label class="block text-xs font-bold text-slate-600 mb-1">Teléfono / WhatsApp</label>
+                                <input id="cfg-phone" type="text" value="${escapeHtml(cfg.phone)}"
+                                       class="w-full bg-slate-50 border-[1.5px] border-slate-300 rounded-xl px-3.5 py-2.5 text-sm font-semibold focus:outline-none focus:border-brand-cyan focus:bg-white">
+                            </div>
+
+                            <div>
+                                <label class="block text-xs font-bold text-slate-600 mb-1">Moneda</label>
+                                <select id="cfg-currency"
+                                        class="w-full bg-slate-50 border-[1.5px] border-slate-300 rounded-xl px-3.5 py-2.5 text-sm font-semibold focus:outline-none focus:border-brand-cyan focus:bg-white">
+                                    <option value="MXN - Peso mexicano" ${cfg.currency === 'MXN - Peso mexicano' ? 'selected' : ''}>MXN - Peso mexicano</option>
+                                    <option value="USD - Dólar" ${cfg.currency === 'USD - Dólar' ? 'selected' : ''}>USD - Dólar</option>
+                                </select>
+                            </div>
+
+                            <div class="pt-2 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
+                                <button type="submit"
+                                        class="btn-primary-gradient text-white rounded-xl px-5 py-2.5 text-sm font-bold flex items-center justify-center gap-2 transition cursor-pointer">
+                                    <i class="ph-bold ph-check"></i>
+                                    <span>Guardar configuración</span>
+                                </button>
+
+                                <button id="cfg-reset-btn" type="button"
+                                        class="bg-white text-brand-blue border-[1.5px] border-brand-blue hover:bg-brand-blueLight hover:border-brand-cyan rounded-xl px-4 py-2.5 text-sm font-bold flex items-center justify-center gap-2 transition cursor-pointer">
+                                    <i class="ph-bold ph-arrow-counter-clockwise"></i>
+                                    <span>Restaurar datos demo</span>
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <div class="bg-white border border-[#dbe4f0] rounded-2xl p-6 shadow-xs space-y-4 h-fit">
+                        <h3 class="text-base font-extrabold text-brand-blue flex items-center gap-2">
+                            <i class="ph-bold ph-plugs-connected text-brand-cyanDark"></i>
+                            <span>Servidor PHP Local</span>
+                        </h3>
+                        <p class="text-xs text-slate-600 leading-relaxed">
+                            Ejecuta <code class="bg-slate-100 px-1.5 py-0.5 rounded font-mono text-brand-blue">./run_server.sh</code> en tu máquina para conectar esta página a tu base de datos SQLite local.
+                        </p>
                         <div>
-                            <label class="block text-xs font-bold text-slate-600 mb-1">Nombre de la tienda</label>
-                            <input id="cfg-store" type="text" value="${escapeHtml(cfg.storeName)}"
-                                   class="w-full bg-slate-50 border-[1.5px] border-slate-300 rounded-xl px-3.5 py-2.5 text-sm font-semibold focus:outline-none focus:border-brand-cyan focus:bg-white">
+                            <label class="block text-xs font-bold text-slate-600 mb-1">URL del API PHP</label>
+                            <input id="cfg-server-url" type="text" value="${escapeHtml(configuredServerUrl)}"
+                                   class="w-full bg-slate-50 border-[1.5px] border-slate-300 rounded-xl px-3 py-2 text-xs font-mono focus:outline-none focus:border-brand-cyan">
                         </div>
-
-                        <div>
-                            <label class="block text-xs font-bold text-slate-600 mb-1">Propietario</label>
-                            <input id="cfg-owner" type="text" value="${escapeHtml(cfg.owner)}"
-                                   class="w-full bg-slate-50 border-[1.5px] border-slate-300 rounded-xl px-3.5 py-2.5 text-sm font-semibold focus:outline-none focus:border-brand-cyan focus:bg-white">
-                        </div>
-
-                        <div>
-                            <label class="block text-xs font-bold text-slate-600 mb-1">Teléfono / WhatsApp</label>
-                            <input id="cfg-phone" type="text" value="${escapeHtml(cfg.phone)}"
-                                   class="w-full bg-slate-50 border-[1.5px] border-slate-300 rounded-xl px-3.5 py-2.5 text-sm font-semibold focus:outline-none focus:border-brand-cyan focus:bg-white">
-                        </div>
-
-                        <div>
-                            <label class="block text-xs font-bold text-slate-600 mb-1">Moneda</label>
-                            <select id="cfg-currency"
-                                    class="w-full bg-slate-50 border-[1.5px] border-slate-300 rounded-xl px-3.5 py-2.5 text-sm font-semibold focus:outline-none focus:border-brand-cyan focus:bg-white">
-                                <option value="MXN - Peso mexicano" ${cfg.currency === 'MXN - Peso mexicano' ? 'selected' : ''}>MXN - Peso mexicano</option>
-                                <option value="USD - Dólar" ${cfg.currency === 'USD - Dólar' ? 'selected' : ''}>USD - Dólar</option>
-                            </select>
-                        </div>
-
-                        <div class="pt-2 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
-                            <button type="submit"
-                                    class="btn-primary-gradient text-white rounded-xl px-5 py-2.5 text-sm font-bold flex items-center justify-center gap-2 transition cursor-pointer">
-                                <i class="ph-bold ph-check"></i>
-                                <span>Guardar configuración</span>
-                            </button>
-
-                            <button id="cfg-reset-btn" type="button"
-                                    class="bg-white text-brand-blue border-[1.5px] border-brand-blue hover:bg-brand-blueLight hover:border-brand-cyan rounded-xl px-4 py-2.5 text-sm font-bold flex items-center justify-center gap-2 transition cursor-pointer">
-                                <i class="ph-bold ph-arrow-counter-clockwise"></i>
-                                <span>Restaurar datos demo</span>
-                            </button>
-                        </div>
-                    </form>
+                        <button id="cfg-connect-btn" type="button"
+                                class="w-full btn-primary-gradient text-white rounded-xl px-4 py-2 text-xs font-bold flex items-center justify-center gap-2 cursor-pointer">
+                            <i class="ph-bold ph-arrows-clockwise"></i>
+                            <span>Conectar / Reconectar PHP</span>
+                        </button>
+                    </div>
                 </div>
             `;
 
-            document.getElementById('cfg-form').addEventListener('submit', (e) => {
+            document.getElementById('cfg-form').addEventListener('submit', async (e) => {
                 e.preventDefault();
-                state.config = {
+                const payload = {
                     storeName: document.getElementById('cfg-store').value.trim(),
                     owner: document.getElementById('cfg-owner').value.trim(),
                     phone: document.getElementById('cfg-phone').value.trim(),
                     currency: document.getElementById('cfg-currency').value
                 };
-                saveState(state);
+                if (phpApiUrl) {
+                    try {
+                        await apiCall('config_save', payload);
+                        showToast('Configuración guardada en SQLite', 'La configuración de PymeSync fue guardada.');
+                    } catch (err) {
+                        showToast('Error', err.message, 'error');
+                    }
+                    return;
+                }
+                state.config = payload;
+                saveLocalState(state);
                 showToast('Configuración guardada', 'La configuración de PymeSync fue guardada correctamente.');
             });
 
-            document.getElementById('cfg-reset-btn').addEventListener('click', () => {
+            document.getElementById('cfg-reset-btn').addEventListener('click', async () => {
+                if (phpApiUrl) {
+                    try {
+                        await apiCall('reset_demo', {});
+                        cart = []; selectedCartIndex = -1; selectedProductId = null;
+                        showToast('SQLite restaurado', 'La base de datos regresó al estado demo inicial.');
+                        renderConfiguracion(container);
+                    } catch (err) {
+                        showToast('Error', err.message, 'error');
+                    }
+                    return;
+                }
                 state = buildDefaultState();
-                cart = [];
-                selectedCartIndex = -1;
-                selectedProductId = null;
-                saveState(state);
+                cart = []; selectedCartIndex = -1; selectedProductId = null;
+                saveLocalState(state);
                 showToast('Datos restaurados', 'El catálogo, ventas y movimientos regresaron al estado demo inicial.');
                 renderConfiguracion(container);
             });
+
+            document.getElementById('cfg-connect-btn').addEventListener('click', async () => {
+                const url = document.getElementById('cfg-server-url').value.trim();
+                if (!url) return;
+                configuredServerUrl = url;
+                localStorage.setItem(SERVER_URL_KEY, url);
+                const ok = await probePhpServer(url);
+                if (ok) {
+                    showToast('PHP + SQLite Conectado', `Conectado correctamente a ${url}`);
+                    renderConfiguracion(container);
+                } else {
+                    showToast('Servidor no detectado', `No se pudo conectar a ${url}. Asegúrate de correr ./run_server.sh`, 'warning');
+                }
+            });
         }
 
-        // ======================================================================
-        // AUTENTICACIÓN Y NAVEGACIÓN
-        // ======================================================================
-        function showApp(userName) {
-            sessionStorage.setItem(SESSION_KEY, userName);
+        function showApp(userName, userRole = 'Administrador') {
+            sessionStorage.setItem(SESSION_KEY, JSON.stringify({ nombre: userName, rol: userRole }));
             document.getElementById('topbar-user-name').textContent = userName;
+            document.getElementById('topbar-user-role').textContent = `${userRole} · PymeSync`;
             document.getElementById('login-view').classList.add('hidden');
             document.getElementById('app-view').classList.remove('hidden');
             renderPage('dashboard');
@@ -1558,23 +1635,54 @@
             document.getElementById('login-error').classList.add('hidden');
         });
 
-        document.getElementById('login-form').addEventListener('submit', (e) => {
+        document.getElementById('login-form').addEventListener('submit', async (e) => {
             e.preventDefault();
-            const user = document.getElementById('login-user').value.trim();
-            const pass = document.getElementById('login-pass').value;
+            const usuario = document.getElementById('login-user').value.trim();
+            const password = document.getElementById('login-pass').value;
             const errEl = document.getElementById('login-error');
 
-            if (user === 'admin' && pass === 'admin123') {
+            if (phpApiUrl) {
+                try {
+                    const res = await apiCall('login', { usuario, password });
+                    errEl.classList.add('hidden');
+                    showApp(res.user.nombre, res.user.rol);
+                } catch (err) {
+                    errEl.textContent = err.message || 'Usuario o contraseña incorrectos.';
+                    errEl.classList.remove('hidden');
+                }
+                return;
+            }
+
+            if (usuario === 'admin' && password === 'admin123') {
                 errEl.classList.add('hidden');
-                showApp('Administrador');
+                showApp('Administrador', 'Administrador');
             } else {
                 errEl.classList.remove('hidden');
             }
         });
 
-        document.getElementById('logout-btn').addEventListener('click', showLogin);
+        document.getElementById('logout-btn').addEventListener('click', async () => {
+            if (phpApiUrl) {
+                try { await apiCall('logout', {}); } catch (e) {}
+            }
+            showLogin();
+        });
 
-        // Navegación Sidebar + Menú Móvil
+        async function handleManualReconnect() {
+            const ok = await probePhpServer();
+            if (ok) {
+                showToast('PHP + SQLite Conectado', `Sincronizado con ${phpApiUrl}`);
+                if (!document.getElementById('app-view').classList.contains('hidden')) {
+                    renderPage(currentPage);
+                }
+            } else {
+                showToast('Sin conexión PHP', 'Ejecuta ./run_server.sh en tu máquina y vuelve a intentar.', 'warning');
+            }
+        }
+
+        document.getElementById('login-reconnect-btn').addEventListener('click', handleManualReconnect);
+        document.getElementById('sidebar-reconnect-btn').addEventListener('click', handleManualReconnect);
+
         const sidebarEl = document.getElementById('sidebar');
         const overlayEl = document.getElementById('mobile-overlay');
 
@@ -1598,11 +1706,20 @@
             });
         });
 
-        // Iniciar según sesión activa o parámetros URL (?demo=1)
-        const activeUser = sessionStorage.getItem(SESSION_KEY);
-        if (activeUser || new URLSearchParams(window.location.search).get('demo') === '1') {
-            showApp(activeUser || 'Administrador');
-        }
+        (async () => {
+            await probePhpServer();
+            const rawSess = sessionStorage.getItem(SESSION_KEY);
+            if (rawSess) {
+                try {
+                    const s = JSON.parse(rawSess);
+                    showApp(s.nombre || 'Administrador', s.rol || 'Administrador');
+                    return;
+                } catch (e) {}
+            }
+            if (new URLSearchParams(window.location.search).get('demo') === '1') {
+                showApp('Administrador', 'Administrador');
+            }
+        })();
     </script>
 </body>
 </html>

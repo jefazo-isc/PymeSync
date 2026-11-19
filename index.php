@@ -1,0 +1,1487 @@
+<?php
+declare(strict_types=1);
+
+require_once __DIR__ . '/src/Database.php';
+require_once __DIR__ . '/src/Auth.php';
+require_once __DIR__ . '/src/StoreRepository.php';
+
+Auth::ensureSession();
+$db = Database::connect();
+$repo = new StoreRepository($db);
+
+$initialState = $repo->getFullState();
+$currentUser = Auth::user();
+$phpVersion = PHP_VERSION;
+?>
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PymeSync · Tu tiendita, bien chidita (PHP + SQLite)</title>
+
+    <!-- Google Fonts: Plus Jakarta Sans & JetBrains Mono -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Phosphor Icons CSS -->
+    <link rel="stylesheet" type="text/css" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/bold/style.css"/>
+    <link rel="stylesheet" type="text/css" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/fill/style.css"/>
+    <link rel="stylesheet" type="text/css" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css"/>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['"Plus Jakarta Sans"', 'system-ui', 'sans-serif'],
+                        mono: ['"JetBrains Mono"', 'monospace'],
+                    },
+                    colors: {
+                        brand: {
+                            blue: '#0e498c',
+                            blueDark: '#0a3666',
+                            navy: '#072448',
+                            blueLight: '#eff6ff',
+                            cyan: '#14b6c4',
+                            cyanDark: '#0e8a94',
+                            cyanLight: '#e6fafc',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            font-family: "Plus Jakarta Sans", system-ui, sans-serif;
+            background-color: #f1f5f9;
+            color: #1e293b;
+        }
+        .sidebar-gradient {
+            background: linear-gradient(180deg, #072448 0%, #0a3161 55%, #061d3b 100%);
+        }
+        .login-hero-gradient {
+            background: linear-gradient(135deg, #072448 0%, #0e498c 60%, #0b7a8c 100%);
+        }
+        .btn-primary-gradient {
+            background: linear-gradient(90deg, #0e498c 0%, #14b6c4 100%);
+        }
+        .btn-primary-gradient:hover {
+            background: linear-gradient(90deg, #0a3666 0%, #0e8a94 100%);
+        }
+        .nav-btn-active {
+            background: linear-gradient(90deg, #0e498c 0%, #14b6c4 100%);
+            color: #ffffff;
+            border: 1px solid #5eead4;
+            font-weight: 800;
+        }
+        .nav-btn-idle {
+            color: #cbd5e1;
+            border: 1px solid transparent;
+        }
+        .nav-btn-idle:hover {
+            background: rgba(20, 182, 196, 0.14);
+            color: #ffffff;
+            border: 1px solid rgba(20, 182, 196, 0.30);
+        }
+        .topbar-accent {
+            background: linear-gradient(90deg, #0e498c 0%, #14b6c4 50%, #0e498c 100%);
+        }
+        .logo-clean-crop {
+            object-fit: contain;
+        }
+        ::-webkit-scrollbar { width: 7px; height: 7px; }
+        ::-webkit-scrollbar-track { background: #f1f5f9; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 9999px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+    </style>
+</head>
+<body class="antialiased selection:bg-brand-cyan/20 selection:text-brand-blue">
+
+    <!-- ====================================================================== -->
+    <!-- PANTALLA DE LOGIN                                                      -->
+    <!-- ====================================================================== -->
+    <div id="login-view" class="min-h-screen flex flex-col lg:flex-row">
+        <div class="lg:w-1/2 login-hero-gradient p-8 sm:p-12 lg:p-14 flex flex-col justify-between text-white">
+            <div class="space-y-4">
+                <div class="bg-white border-2 border-brand-cyan rounded-2xl px-5 py-3 inline-flex items-center shadow-lg">
+                    <img src="logo_horizontal_clean.png" alt="PymeSync" class="h-11 sm:h-12 w-auto logo-clean-crop">
+                </div>
+                <div class="flex flex-wrap items-center gap-2">
+                    <span class="inline-block bg-brand-cyan/20 text-[#5eead4] border border-brand-cyan rounded-lg px-3 py-1.5 text-xs font-extrabold tracking-wide">
+                        «TU TIENDITA, BIEN CHIDITA» · SaaS B2B
+                    </span>
+                    <span class="inline-block bg-white/10 text-white border border-white/25 rounded-lg px-3 py-1.5 text-xs font-bold">
+                        PHP <?= htmlspecialchars($phpVersion) ?> + SQLite
+                    </span>
+                </div>
+            </div>
+
+            <div class="my-10 lg:my-0 space-y-5 max-w-xl">
+                <h1 class="text-3xl sm:text-4xl lg:text-[40px] font-extrabold leading-tight">
+                    El control total de tu negocio, sin complicaciones
+                </h1>
+                <p class="text-slate-200 text-base leading-relaxed">
+                    Controla ventas, inventario, precios, entradas, proveedores y reportes desde una interfaz web en PHP con base de datos local SQLite.
+                </p>
+                <div class="space-y-2.5 pt-2 text-sm font-semibold text-teal-50">
+                    <div class="flex items-center gap-2.5">
+                        <i class="ph-bold ph-check-circle text-brand-cyan text-lg"></i>
+                        <span>Punto de venta ágil y corte de caja automático</span>
+                    </div>
+                    <div class="flex items-center gap-2.5">
+                        <i class="ph-bold ph-check-circle text-brand-cyan text-lg"></i>
+                        <span>Alertas de stock mínimo y control de entradas</span>
+                    </div>
+                    <div class="flex items-center gap-2.5">
+                        <i class="ph-bold ph-check-circle text-brand-cyan text-lg"></i>
+                        <span>Base de datos SQLite local sin depender de internet</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="text-xs text-slate-300/80 font-medium">
+                PymeSync SaaS · Equipo 3 · Universidad Autónoma de Aguascalientes
+            </div>
+        </div>
+
+        <div class="lg:w-1/2 bg-[#f1f5f9] p-6 sm:p-12 flex items-center justify-center">
+            <div class="w-full max-w-md bg-white border border-[#dbe4f0] rounded-2xl p-8 sm:p-9 shadow-sm">
+                <div class="mb-5">
+                    <img src="logo_horizontal_clean.png" alt="PymeSync" class="h-9 w-auto logo-clean-crop mb-3">
+                    <h2 class="text-2xl sm:text-3xl font-extrabold text-brand-blue">Bienvenido</h2>
+                    <p class="text-sm text-slate-500 font-medium mt-1">
+                        Inicia sesión en PymeSync (Servidor Local PHP)
+                    </p>
+                </div>
+
+                <form id="login-form" class="space-y-4">
+                    <div>
+                        <label for="login-user" class="block text-sm font-semibold text-slate-700 mb-1.5">Usuario</label>
+                        <input id="login-user" type="text" placeholder="Ingresa tu usuario (ej. admin)"
+                               class="w-full bg-slate-50 border-[1.5px] border-slate-300 rounded-xl px-3.5 py-2.5 text-sm text-slate-900 font-medium focus:outline-none focus:border-brand-cyan focus:bg-white transition">
+                    </div>
+
+                    <div>
+                        <label for="login-pass" class="block text-sm font-semibold text-slate-700 mb-1.5">Contraseña</label>
+                        <input id="login-pass" type="password" placeholder="Ingresa tu contraseña"
+                               class="w-full bg-slate-50 border-[1.5px] border-slate-300 rounded-xl px-3.5 py-2.5 text-sm text-slate-900 font-medium focus:outline-none focus:border-brand-cyan focus:bg-white transition">
+                    </div>
+
+                    <label class="inline-flex items-center gap-2 text-sm font-semibold text-slate-600 cursor-pointer select-none">
+                        <input id="login-show-pass" type="checkbox" class="rounded border-slate-300 text-brand-cyan focus:ring-brand-cyan">
+                        <span>Mostrar contraseña</span>
+                    </label>
+
+                    <div id="login-error" class="hidden text-xs font-bold text-red-700 bg-red-50 border border-red-200 rounded-lg px-3 py-2">
+                        Usuario o contraseña incorrectos.
+                    </div>
+
+                    <button type="submit"
+                            class="w-full btn-primary-gradient text-white font-bold py-2.5 px-4 rounded-xl flex items-center justify-center gap-2 shadow-sm transition cursor-pointer">
+                        <i class="ph-bold ph-check"></i>
+                        <span>Iniciar sesión</span>
+                    </button>
+
+                    <button id="demo-fill-btn" type="button"
+                            class="w-full bg-brand-blueLight hover:bg-brand-cyanLight text-brand-blue border border-dashed border-brand-cyan rounded-xl py-2 px-3 text-xs font-bold transition cursor-pointer">
+                        Acceso Demo · Usuario: admin | Contraseña: admin123
+                    </button>
+                </form>
+
+                <div class="mt-5 pt-4 border-t border-slate-100 text-center">
+                    <a href="pymesync_canvas.html" target="_blank"
+                       class="inline-flex items-center gap-1.5 text-xs font-bold text-brand-cyanDark hover:text-brand-blue transition">
+                        <i class="ph-bold ph-presentation-chart"></i>
+                        <span>Ver Business Model Canvas</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ====================================================================== -->
+    <!-- APLICACIÓN PRINCIPAL                                                   -->
+    <!-- ====================================================================== -->
+    <div id="app-view" class="hidden min-h-screen flex">
+        <div id="mobile-overlay" class="fixed inset-0 bg-slate-900/50 z-30 hidden lg:hidden"></div>
+
+        <aside id="sidebar"
+               class="fixed lg:static inset-y-0 left-0 z-40 w-[264px] shrink-0 sidebar-gradient border-r border-brand-blue flex flex-col p-4 transition-transform duration-200 -translate-x-full lg:translate-x-0">
+
+            <div class="bg-white border-2 border-brand-cyan rounded-xl px-3 py-2.5 text-center shadow-sm">
+                <img src="logo_horizontal_clean.png" alt="PymeSync" class="h-9 mx-auto w-auto logo-clean-crop">
+                <p class="text-[11px] font-extrabold text-brand-cyanDark tracking-wide mt-1">
+                    «Tu tiendita, bien chidita»
+                </p>
+            </div>
+
+            <div class="text-[10px] font-extrabold text-slate-400 tracking-widest uppercase px-2 mt-4 mb-2">
+                Plataforma de Gestión Comercial
+            </div>
+
+            <nav id="sidebar-nav" class="flex-1 space-y-1.5 overflow-y-auto pr-0.5">
+                <button data-page="dashboard" class="nav-item w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-[13.5px] font-semibold transition cursor-pointer text-left">
+                    <i class="ph-bold ph-squares-four text-lg"></i><span>Inicio</span>
+                </button>
+                <button data-page="ventas" class="nav-item w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-[13.5px] font-semibold transition cursor-pointer text-left">
+                    <i class="ph-bold ph-shopping-cart text-lg"></i><span>Ventas</span>
+                </button>
+                <button data-page="productos" class="nav-item w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-[13.5px] font-semibold transition cursor-pointer text-left">
+                    <i class="ph-bold ph-package text-lg"></i><span>Productos</span>
+                </button>
+                <button data-page="inventario" class="nav-item w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-[13.5px] font-semibold transition cursor-pointer text-left">
+                    <i class="ph-bold ph-clipboard-text text-lg"></i><span>Inventario</span>
+                </button>
+                <button data-page="movimientos" class="nav-item w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-[13.5px] font-semibold transition cursor-pointer text-left">
+                    <i class="ph-bold ph-arrows-clockwise text-lg"></i><span>Movimientos</span>
+                </button>
+                <button data-page="proveedores" class="nav-item w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-[13.5px] font-semibold transition cursor-pointer text-left">
+                    <i class="ph-bold ph-truck text-lg"></i><span>Proveedores</span>
+                </button>
+                <button data-page="reportes" class="nav-item w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-[13.5px] font-semibold transition cursor-pointer text-left">
+                    <i class="ph-bold ph-chart-bar text-lg"></i><span>Reportes</span>
+                </button>
+                <button data-page="admin" class="nav-item w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-[13.5px] font-semibold transition cursor-pointer text-left">
+                    <i class="ph-bold ph-users-three text-lg"></i><span>Administración</span>
+                </button>
+                <button data-page="configuracion" class="nav-item w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-[13.5px] font-semibold transition cursor-pointer text-left">
+                    <i class="ph-bold ph-sliders-horizontal text-lg"></i><span>Configuración</span>
+                </button>
+            </nav>
+
+            <div class="mt-4 space-y-2">
+                <div class="bg-brand-blue/35 border border-brand-cyan/30 rounded-xl px-3 py-2.5">
+                    <div class="text-[11px] font-extrabold text-[#5eead4] flex items-center gap-1.5">
+                        <span>●</span>
+                        <span>Servidor PHP <?= htmlspecialchars($phpVersion) ?> + SQLite Activo</span>
+                    </div>
+                    <div class="text-[11px] text-slate-400 mt-0.5">PymeSync SaaS · Equipo 3 UAA</div>
+                </div>
+                <button id="logout-btn"
+                        class="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-xl text-xs font-bold text-slate-300 hover:text-white hover:bg-white/10 border border-white/10 transition cursor-pointer">
+                    <i class="ph-bold ph-sign-out"></i>
+                    <span>Cerrar sesión</span>
+                </button>
+            </div>
+        </aside>
+
+        <div class="flex-1 flex flex-col min-w-0">
+            <header class="bg-white border-b-2 border-slate-200 sticky top-0 z-20">
+                <div class="h-1 topbar-accent"></div>
+                <div class="px-4 sm:px-7 py-3 flex items-center justify-between gap-3">
+                    <div class="flex items-center gap-3">
+                        <button id="mobile-menu-btn"
+                                class="lg:hidden p-2 rounded-lg border border-slate-200 text-brand-blue hover:bg-brand-blueLight">
+                            <i class="ph-bold ph-list text-xl"></i>
+                        </button>
+                        <div id="topbar-icon" class="w-8 h-8 rounded-lg bg-brand-cyanLight text-brand-blue flex items-center justify-center">
+                            <i class="ph-bold ph-squares-four text-lg"></i>
+                        </div>
+                        <h1 id="topbar-title" class="text-lg sm:text-xl font-extrabold text-brand-blue">Inicio</h1>
+                        <span class="hidden sm:inline-block bg-brand-cyanLight text-brand-cyanDark border border-teal-200 rounded-md px-2.5 py-0.5 text-[11px] font-extrabold">
+                            «Tu tiendita, bien chidita»
+                        </span>
+                    </div>
+
+                    <div class="flex items-center gap-3 sm:gap-4">
+                        <a href="pymesync_canvas.html" target="_blank"
+                           class="hidden md:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-brand-blueLight hover:bg-brand-cyanLight text-brand-blue border border-brand-blue/20 text-xs font-bold transition">
+                            <i class="ph-bold ph-presentation-chart text-sm"></i>
+                            <span>Canvas</span>
+                        </a>
+                        <div class="flex items-center gap-2.5">
+                            <div class="w-9 h-9 rounded-lg bg-brand-blue text-white flex items-center justify-center shadow-xs">
+                                <i class="ph-bold ph-user text-lg"></i>
+                            </div>
+                            <div class="leading-tight hidden sm:block">
+                                <div id="topbar-user-name" class="text-[13.5px] font-extrabold text-brand-blue">Administrador</div>
+                                <div id="topbar-user-role" class="text-[11px] font-bold text-brand-cyanDark">Administrador · PymeSync</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <main class="flex-1 p-4 sm:p-7 overflow-y-auto">
+                <div id="page-container" class="max-w-[1400px] mx-auto"></div>
+            </main>
+        </div>
+    </div>
+
+    <!-- Modal Genérico -->
+    <div id="modal-backdrop" class="fixed inset-0 bg-slate-900/50 backdrop-blur-[1px] z-50 hidden items-center justify-center p-4">
+        <div class="bg-white border border-[#dbe4f0] rounded-2xl w-full max-w-md shadow-2xl overflow-hidden">
+            <div class="h-1 topbar-accent"></div>
+            <div class="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
+                <h3 id="modal-title" class="text-lg font-extrabold text-brand-blue">Modal</h3>
+                <button id="modal-close" class="text-slate-400 hover:text-slate-700 p-1 rounded-lg cursor-pointer">
+                    <i class="ph-bold ph-x text-lg"></i>
+                </button>
+            </div>
+            <form id="modal-form" class="p-6 space-y-4">
+                <div id="modal-fields" class="space-y-3.5"></div>
+                <div class="pt-2 flex items-center justify-end gap-2.5">
+                    <button type="button" id="modal-cancel"
+                            class="bg-white text-brand-blue border-[1.5px] border-brand-blue hover:bg-brand-blueLight hover:border-brand-cyan rounded-xl px-4 py-2 text-sm font-bold transition cursor-pointer">
+                        Cancelar
+                    </button>
+                    <button type="submit"
+                            class="btn-primary-gradient text-white rounded-xl px-5 py-2 text-sm font-bold transition cursor-pointer">
+                        Guardar
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div id="toast-container" class="fixed bottom-5 right-5 z-50 space-y-2 max-w-sm"></div>
+
+    <script>
+        window.__PYMESYNC_INITIAL_STATE__ = <?= json_encode($initialState, JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP) ?>;
+        window.__PYMESYNC_USER__ = <?= json_encode($currentUser, JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP) ?>;
+
+        let state = window.__PYMESYNC_INITIAL_STATE__;
+        let currentUser = window.__PYMESYNC_USER__;
+        let currentPage = 'dashboard';
+        let cart = [];
+        let selectedCartIndex = -1;
+        let selectedProductId = null;
+        let productSearchText = '';
+
+        const PAGE_META = {
+            dashboard: { title: 'Inicio', icon: 'ph-squares-four' },
+            ventas: { title: 'Ventas', icon: 'ph-shopping-cart' },
+            productos: { title: 'Productos', icon: 'ph-package' },
+            inventario: { title: 'Inventario', icon: 'ph-clipboard-text' },
+            movimientos: { title: 'Movimientos', icon: 'ph-arrows-clockwise' },
+            proveedores: { title: 'Proveedores', icon: 'ph-truck' },
+            reportes: { title: 'Reportes', icon: 'ph-chart-bar' },
+            admin: { title: 'Administración', icon: 'ph-users-three' },
+            configuracion: { title: 'Configuración', icon: 'ph-sliders-horizontal' }
+        };
+
+        async function apiCall(action, payload = null) {
+            const opts = payload === null
+                ? { method: 'GET', credentials: 'same-origin' }
+                : {
+                    method: 'POST',
+                    credentials: 'same-origin',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                };
+            const resp = await fetch(`api.php?action=${encodeURIComponent(action)}`, opts);
+            const data = await resp.json();
+            if (!resp.ok || !data.ok) {
+                throw new Error(data.error || 'Error de comunicación con el servidor PHP.');
+            }
+            if (data.state) {
+                state = data.state;
+            }
+            return data;
+        }
+
+        function formatDateTime(dateInput) {
+            const d = new Date(dateInput);
+            if (isNaN(d.getTime())) return String(dateInput ?? '');
+            const pad = n => String(n).padStart(2, '0');
+            return `${pad(d.getDate())}/${pad(d.getMonth() + 1)}/${d.getFullYear()} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
+        }
+
+        function formatMoney(num) {
+            return '$' + Number(num || 0).toLocaleString('en-US', {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+            });
+        }
+
+        function escapeHtml(str) {
+            return String(str ?? '')
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;');
+        }
+
+        function showToast(title, message, type = 'success') {
+            const container = document.getElementById('toast-container');
+            const colors = {
+                success: 'bg-white border-l-4 border-l-brand-cyan border-slate-200 text-slate-800',
+                warning: 'bg-amber-50 border-l-4 border-l-amber-500 border-amber-200 text-amber-900',
+                error: 'bg-red-50 border-l-4 border-l-red-500 border-red-200 text-red-900'
+            };
+            const icon = type === 'success' ? 'ph-check-circle text-brand-cyanDark'
+                       : type === 'warning' ? 'ph-warning text-amber-600'
+                       : 'ph-x-circle text-red-600';
+
+            const el = document.createElement('div');
+            el.className = `border rounded-xl p-3.5 shadow-lg flex items-start gap-3 transition-all duration-200 ${colors[type] || colors.success}`;
+            el.innerHTML = `
+                <i class="ph-bold ${icon} text-xl shrink-0 mt-0.5"></i>
+                <div class="text-xs leading-relaxed">
+                    <div class="font-extrabold text-brand-blue text-[13px]">${escapeHtml(title)}</div>
+                    <div class="font-medium mt-0.5">${escapeHtml(message)}</div>
+                </div>
+            `;
+            container.appendChild(el);
+            setTimeout(() => {
+                el.classList.add('opacity-0', 'translate-y-2');
+                setTimeout(() => el.remove(), 220);
+            }, 3400);
+        }
+
+        let modalOnSubmit = null;
+
+        function openModal(title, fieldsHtml, onSubmit) {
+            document.getElementById('modal-title').textContent = title;
+            document.getElementById('modal-fields').innerHTML = fieldsHtml;
+            modalOnSubmit = onSubmit;
+            const backdrop = document.getElementById('modal-backdrop');
+            backdrop.classList.remove('hidden');
+            backdrop.classList.add('flex');
+        }
+
+        function closeModal() {
+            const backdrop = document.getElementById('modal-backdrop');
+            backdrop.classList.add('hidden');
+            backdrop.classList.remove('flex');
+            modalOnSubmit = null;
+        }
+
+        document.getElementById('modal-close').addEventListener('click', closeModal);
+        document.getElementById('modal-cancel').addEventListener('click', closeModal);
+        document.getElementById('modal-backdrop').addEventListener('click', (e) => {
+            if (e.target.id === 'modal-backdrop') closeModal();
+        });
+        document.getElementById('modal-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            if (modalOnSubmit) await modalOnSubmit();
+        });
+
+        function sectionHeaderHtml(iconClass, title, subtitle, actionHtml = '') {
+            return `
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-5">
+                    <div class="flex items-center gap-3.5">
+                        <div class="w-11 h-11 rounded-xl bg-brand-cyanLight text-brand-blue flex items-center justify-center shrink-0">
+                            <i class="ph-bold ${iconClass} text-2xl"></i>
+                        </div>
+                        <div>
+                            <h2 class="text-xl sm:text-2xl font-extrabold text-brand-blueDark leading-tight">${escapeHtml(title)}</h2>
+                            <p class="text-xs sm:text-[13px] text-slate-500 font-medium">${escapeHtml(subtitle)}</p>
+                        </div>
+                    </div>
+                    ${actionHtml ? `<div>${actionHtml}</div>` : ''}
+                </div>
+            `;
+        }
+
+        function statCardHtml(title, value, detail, iconClass, variant = 'blue') {
+            const styles = {
+                blue: { border: 'border-t-4 border-t-brand-blue border-[#dbe4f0]', valColor: 'text-brand-blue', iconBg: 'bg-brand-blueLight text-brand-blue' },
+                cyan: { border: 'border-t-4 border-t-brand-cyan border-[#dbe4f0]', valColor: 'text-brand-cyanDark', iconBg: 'bg-brand-cyanLight text-brand-cyanDark' },
+                alert: { border: 'border-t-4 border-t-amber-500 border-amber-200', valColor: 'text-amber-600', iconBg: 'bg-amber-100 text-amber-600' }
+            };
+            const s = styles[variant] || styles.blue;
+            return `
+                <div class="bg-white border ${s.border} rounded-2xl p-5 shadow-xs">
+                    <div class="flex items-center justify-between mb-1.5">
+                        <span class="text-[11px] font-bold uppercase tracking-wider text-slate-600">${escapeHtml(title)}</span>
+                        <div class="w-8 h-8 rounded-lg ${s.iconBg} flex items-center justify-center">
+                            <i class="ph-bold ${iconClass} text-lg"></i>
+                        </div>
+                    </div>
+                    <div class="text-2xl sm:text-[27px] font-extrabold ${s.valColor} leading-tight">${escapeHtml(value)}</div>
+                    <div class="text-[11.5px] font-semibold text-slate-500 mt-1">${escapeHtml(detail)}</div>
+                </div>
+            `;
+        }
+
+        function badgeForValue(text) {
+            const v = String(text).trim();
+            if (['Disponible', 'Activo', 'Entrada'].includes(v)) {
+                return `<span class="inline-flex items-center px-2.5 py-0.5 rounded-md text-xs font-extrabold bg-brand-cyanLight text-brand-cyanDark border border-teal-200">${escapeHtml(v)}</span>`;
+            }
+            if (['Stock bajo', 'Ajuste'].includes(v)) {
+                return `<span class="inline-flex items-center px-2.5 py-0.5 rounded-md text-xs font-extrabold bg-amber-100 text-amber-700 border border-amber-200">${escapeHtml(v)}</span>`;
+            }
+            if (['Agotado'].includes(v)) {
+                return `<span class="inline-flex items-center px-2.5 py-0.5 rounded-md text-xs font-extrabold bg-red-100 text-red-700 border border-red-200">${escapeHtml(v)}</span>`;
+            }
+            if (['Venta'].includes(v)) {
+                return `<span class="inline-flex items-center px-2.5 py-0.5 rounded-md text-xs font-extrabold bg-brand-blueLight text-brand-blue border border-blue-200">${escapeHtml(v)}</span>`;
+            }
+            return escapeHtml(v);
+        }
+
+        function getProduct(id) {
+            return state.products.find(p => Number(p.id) === Number(id)) || null;
+        }
+
+        function renderPage(page) {
+            currentPage = page;
+            document.querySelectorAll('.nav-item').forEach(btn => {
+                const active = btn.dataset.page === page;
+                btn.classList.toggle('nav-btn-active', active);
+                btn.classList.toggle('nav-btn-idle', !active);
+            });
+
+            const meta = PAGE_META[page] || PAGE_META.dashboard;
+            document.getElementById('topbar-title').textContent = meta.title;
+            document.getElementById('topbar-icon').innerHTML = `<i class="ph-bold ${meta.icon} text-lg"></i>`;
+
+            const container = document.getElementById('page-container');
+            if (page === 'dashboard') renderDashboard(container);
+            else if (page === 'ventas') renderVentas(container);
+            else if (page === 'productos') renderProductos(container);
+            else if (page === 'inventario') renderInventario(container);
+            else if (page === 'movimientos') renderMovimientos(container);
+            else if (page === 'proveedores') renderProveedores(container);
+            else if (page === 'reportes') renderReportes(container);
+            else if (page === 'admin') renderAdmin(container);
+            else if (page === 'configuracion') renderConfiguracion(container);
+        }
+
+        function renderDashboard(container) {
+            const todayStr = new Date().toDateString();
+            const todaySales = state.sales.filter(s => new Date(s.fecha).toDateString() === todayStr);
+            const totalToday = todaySales.reduce((acc, s) => acc + Number(s.total), 0);
+            const lowProducts = state.products.filter(p => Number(p.stock) <= Number(p.minimo));
+            const recentSales = [...state.sales].slice(-6).reverse();
+
+            container.innerHTML = `
+                ${sectionHeaderHtml('ph-squares-four', 'Resumen del negocio', 'Estado actual de ventas, productos, operaciones e inventario en tiempo real (SQLite)')}
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 mb-5">
+                    ${statCardHtml('Ventas de hoy', formatMoney(totalToday), 'Ingresos registrados hoy', 'ph-money', 'blue')}
+                    ${statCardHtml('Operaciones', String(todaySales.length), 'Tickets cobrados hoy', 'ph-shopping-cart', 'cyan')}
+                    ${statCardHtml('Productos', String(state.products.length), 'Productos activos en catálogo', 'ph-package', 'blue')}
+                    ${statCardHtml('Stock bajo', String(lowProducts.length), 'Requieren reabastecimiento', 'ph-warning', 'alert')}
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
+                    <div class="bg-white border border-[#dbe4f0] rounded-2xl p-5 shadow-xs">
+                        <h3 class="text-base font-extrabold text-brand-blue mb-3 flex items-center gap-2">
+                            <i class="ph-bold ph-warning text-amber-500"></i>
+                            <span>Productos con stock bajo</span>
+                        </h3>
+                        <div class="overflow-x-auto border border-slate-200 rounded-xl">
+                            <table class="w-full text-sm text-left">
+                                <thead class="bg-[#f0f7ff] text-brand-blue text-xs font-extrabold border-b-2 border-brand-cyan">
+                                    <tr>
+                                        <th class="px-3.5 py-2.5">Producto</th>
+                                        <th class="px-3.5 py-2.5 text-center">Stock</th>
+                                        <th class="px-3.5 py-2.5 text-center">Mínimo</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-slate-100">
+                                    ${lowProducts.length ? lowProducts.map(p => `
+                                        <tr class="odd:bg-white even:bg-slate-50/70 hover:bg-brand-cyanLight/60 transition">
+                                            <td class="px-3.5 py-2.5 font-semibold text-slate-800">${escapeHtml(p.nombre)}</td>
+                                            <td class="px-3.5 py-2.5 text-center font-extrabold text-amber-600">${p.stock}</td>
+                                            <td class="px-3.5 py-2.5 text-center text-slate-600">${p.minimo}</td>
+                                        </tr>
+                                    `).join('') : `
+                                        <tr><td colspan="3" class="px-4 py-6 text-center text-slate-400 font-medium">Todo el inventario en niveles óptimos</td></tr>
+                                    `}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div class="lg:col-span-2 bg-white border border-[#dbe4f0] rounded-2xl p-5 shadow-xs">
+                        <h3 class="text-base font-extrabold text-brand-blue mb-3 flex items-center gap-2">
+                            <i class="ph-bold ph-receipt text-brand-cyanDark"></i>
+                            <span>Ventas recientes</span>
+                        </h3>
+                        <div class="overflow-x-auto border border-slate-200 rounded-xl">
+                            <table class="w-full text-sm text-left">
+                                <thead class="bg-[#f0f7ff] text-brand-blue text-xs font-extrabold border-b-2 border-brand-cyan">
+                                    <tr>
+                                        <th class="px-4 py-2.5">Folio</th>
+                                        <th class="px-4 py-2.5">Fecha</th>
+                                        <th class="px-4 py-2.5 text-center">Productos</th>
+                                        <th class="px-4 py-2.5 text-right">Total</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-slate-100">
+                                    ${recentSales.map(s => `
+                                        <tr class="odd:bg-white even:bg-slate-50/70 hover:bg-brand-cyanLight/60 transition">
+                                            <td class="px-4 py-2.5 font-extrabold text-brand-blue font-mono">${escapeHtml(s.folio)}</td>
+                                            <td class="px-4 py-2.5 text-slate-600">${formatDateTime(s.fecha)}</td>
+                                            <td class="px-4 py-2.5 text-center font-semibold">${s.productos}</td>
+                                            <td class="px-4 py-2.5 text-right font-extrabold text-brand-blue">${formatMoney(s.total)}</td>
+                                        </tr>
+                                    `).join('')}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderVentas(container) {
+            const firstProd = state.products[0];
+            const selectedId = document.getElementById('pos-product')?.value || (firstProd ? firstProd.id : '');
+            const activeProd = getProduct(selectedId) || firstProd;
+            const totalCart = cart.reduce((acc, item) => {
+                const p = getProduct(item.product_id);
+                return acc + (p ? Number(p.precio) * item.cantidad : 0);
+            }, 0);
+
+            container.innerHTML = `
+                ${sectionHeaderHtml('ph-shopping-cart', 'Nueva venta · Punto de Venta', 'Registra productos en el carrito y actualiza SQLite automáticamente')}
+
+                <div class="bg-white border border-[#dbe4f0] rounded-2xl p-4 sm:p-5 shadow-xs mb-5">
+                    <div class="grid grid-cols-1 md:grid-cols-12 gap-3 items-end">
+                        <div class="md:col-span-5">
+                            <label class="block text-xs font-bold text-slate-600 mb-1">Producto</label>
+                            <select id="pos-product"
+                                    class="w-full bg-slate-50 border-[1.5px] border-slate-300 rounded-xl px-3 py-2.5 text-sm font-semibold text-slate-900 focus:outline-none focus:border-brand-cyan focus:bg-white">
+                                ${state.products.map(p => `
+                                    <option value="${p.id}" ${activeProd && Number(p.id) === Number(activeProd.id) ? 'selected' : ''}>
+                                        ${escapeHtml(p.nombre)} - ${formatMoney(p.precio)}
+                                    </option>
+                                `).join('')}
+                            </select>
+                        </div>
+
+                        <div class="md:col-span-2">
+                            <label class="block text-xs font-bold text-slate-600 mb-1">Cantidad</label>
+                            <input id="pos-qty" type="number" min="1" max="${activeProd ? Math.max(activeProd.stock, 1) : 1}" value="1"
+                                   class="w-full bg-slate-50 border-[1.5px] border-slate-300 rounded-xl px-3 py-2.5 text-sm font-bold text-slate-900 focus:outline-none focus:border-brand-cyan focus:bg-white">
+                        </div>
+
+                        <div class="md:col-span-2 flex items-center">
+                            <div id="pos-stock-badge" class="w-full text-center px-3 py-2.5 rounded-xl text-xs font-extrabold border"></div>
+                        </div>
+
+                        <div class="md:col-span-3">
+                            <button id="pos-add-btn"
+                                    class="w-full btn-primary-gradient text-white font-bold py-2.5 px-4 rounded-xl flex items-center justify-center gap-2 transition cursor-pointer">
+                                <i class="ph-bold ph-plus"></i>
+                                <span>Agregar al carrito</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white border border-[#dbe4f0] rounded-2xl p-5 shadow-xs space-y-4">
+                    <div class="overflow-x-auto border border-slate-200 rounded-xl">
+                        <table class="w-full text-sm text-left">
+                            <thead class="bg-[#f0f7ff] text-brand-blue text-xs font-extrabold border-b-2 border-brand-cyan">
+                                <tr>
+                                    <th class="px-4 py-3">Producto</th>
+                                    <th class="px-4 py-3 text-center">Cantidad</th>
+                                    <th class="px-4 py-3 text-right">Precio</th>
+                                    <th class="px-4 py-3 text-right">Subtotal</th>
+                                    <th class="px-4 py-3 text-center">Stock</th>
+                                    <th class="px-4 py-3 text-center">Acción</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-100">
+                                ${cart.length ? cart.map((item, idx) => {
+                                    const p = getProduct(item.product_id);
+                                    if (!p) return '';
+                                    const sub = Number(p.precio) * item.cantidad;
+                                    const isSel = idx === selectedCartIndex;
+                                    return `
+                                        <tr data-cart-idx="${idx}" class="cart-row cursor-pointer transition ${isSel ? 'bg-brand-cyanLight font-bold text-brand-blue' : 'odd:bg-white even:bg-slate-50/70 hover:bg-brand-cyanLight/60'}">
+                                            <td class="px-4 py-2.5 font-semibold">${escapeHtml(p.nombre)}</td>
+                                            <td class="px-4 py-2.5 text-center font-bold">${item.cantidad}</td>
+                                            <td class="px-4 py-2.5 text-right font-bold text-brand-blue">${formatMoney(p.precio)}</td>
+                                            <td class="px-4 py-2.5 text-right font-extrabold text-brand-blue">${formatMoney(sub)}</td>
+                                            <td class="px-4 py-2.5 text-center">${p.stock}</td>
+                                            <td class="px-4 py-2.5 text-center">
+                                                <button data-remove-idx="${idx}" class="remove-inline-btn text-red-600 hover:text-red-800 font-bold text-xs px-2 py-1 rounded-lg hover:bg-red-50 cursor-pointer">
+                                                    Quitar
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    `;
+                                }).join('') : `
+                                    <tr><td colspan="6" class="px-4 py-10 text-center text-slate-400 font-medium">El carrito está vacío. Agrega productos arriba para iniciar una venta.</td></tr>
+                                `}
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 pt-1">
+                        <button id="pos-remove-selected"
+                                class="bg-white text-brand-blue border-[1.5px] border-brand-blue hover:bg-brand-blueLight hover:border-brand-cyan rounded-xl px-4 py-2.5 text-sm font-bold flex items-center justify-center gap-2 transition cursor-pointer">
+                            <i class="ph-bold ph-minus"></i>
+                            <span>Quitar seleccionado</span>
+                        </button>
+
+                        <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+                            <div class="text-center sm:text-right text-xl sm:text-2xl font-extrabold text-brand-blue bg-brand-cyanLight border-[1.5px] border-brand-cyan rounded-xl px-5 py-1.5">
+                                Total: ${formatMoney(totalCart)}
+                            </div>
+                            <button id="pos-finish-btn"
+                                    class="btn-primary-gradient text-white rounded-xl px-5 py-2.5 text-sm font-bold flex items-center justify-center gap-2 transition cursor-pointer">
+                                <i class="ph-bold ph-check"></i>
+                                <span>Finalizar venta</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            const selectEl = document.getElementById('pos-product');
+            const qtyEl = document.getElementById('pos-qty');
+            const badgeEl = document.getElementById('pos-stock-badge');
+
+            function updateStockIndicator() {
+                const p = getProduct(selectEl.value);
+                if (!p) { badgeEl.textContent = 'Stock: 0'; return; }
+                badgeEl.textContent = `Stock: ${p.stock}`;
+                qtyEl.max = Math.max(p.stock, 1);
+                if (p.stock <= p.minimo) {
+                    badgeEl.className = 'w-full text-center px-3 py-2.5 rounded-xl text-xs font-extrabold border bg-amber-100 text-amber-800 border-amber-200';
+                } else {
+                    badgeEl.className = 'w-full text-center px-3 py-2.5 rounded-xl text-xs font-extrabold border bg-brand-cyanLight text-brand-cyanDark border-teal-200';
+                }
+            }
+
+            updateStockIndicator();
+            selectEl.addEventListener('change', updateStockIndicator);
+
+            document.getElementById('pos-add-btn').addEventListener('click', () => {
+                const p = getProduct(selectEl.value);
+                if (!p) return;
+                const qty = Math.max(1, parseInt(qtyEl.value, 10) || 1);
+                const existing = cart.find(i => Number(i.product_id) === Number(p.id));
+                const currentQty = existing ? existing.cantidad : 0;
+
+                if (currentQty + qty > p.stock) {
+                    showToast('Stock insuficiente', `La cantidad supera el stock disponible (${p.stock}).`, 'warning');
+                    return;
+                }
+                if (existing) existing.cantidad += qty;
+                else cart.push({ product_id: Number(p.id), cantidad: qty });
+
+                renderVentas(container);
+            });
+
+            document.querySelectorAll('.cart-row').forEach(row => {
+                row.addEventListener('click', (e) => {
+                    if (e.target.closest('.remove-inline-btn')) return;
+                    selectedCartIndex = Number(row.dataset.cartIdx);
+                    renderVentas(container);
+                });
+            });
+
+            document.querySelectorAll('.remove-inline-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    cart.splice(Number(btn.dataset.removeIdx), 1);
+                    selectedCartIndex = -1;
+                    renderVentas(container);
+                });
+            });
+
+            document.getElementById('pos-remove-selected').addEventListener('click', () => {
+                if (selectedCartIndex >= 0 && selectedCartIndex < cart.length) {
+                    cart.splice(selectedCartIndex, 1);
+                    selectedCartIndex = -1;
+                    renderVentas(container);
+                } else if (cart.length > 0) {
+                    showToast('Selección requerida', 'Haz clic en una fila del carrito para quitarla.', 'warning');
+                }
+            });
+
+            document.getElementById('pos-finish-btn').addEventListener('click', async () => {
+                if (!cart.length) {
+                    showToast('Venta vacía', 'Agrega al menos un producto al carrito.', 'warning');
+                    return;
+                }
+                try {
+                    const res = await apiCall('sale_create', { cart });
+                    cart = [];
+                    selectedCartIndex = -1;
+                    showToast('Venta registrada en SQLite', `Folio ${res.folio} completado. Total cobrado: ${formatMoney(res.total)}`, 'success');
+                    renderVentas(container);
+                } catch (err) {
+                    showToast('Error al registrar venta', err.message, 'error');
+                }
+            });
+        }
+
+        function openProductModal(product = null) {
+            const isEdit = Boolean(product);
+            const html = `
+                <div>
+                    <label class="block text-xs font-bold text-slate-600 mb-1">Código</label>
+                    <input id="m-codigo" type="text" value="${escapeHtml(product?.codigo || '')}" placeholder="Ej. 7501055300012"
+                           class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-sm">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-600 mb-1">Nombre *</label>
+                    <input id="m-nombre" type="text" required value="${escapeHtml(product?.nombre || '')}" placeholder="Ej. Coca-Cola 600 ml"
+                           class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-sm">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-600 mb-1">Categoría</label>
+                    <input id="m-categoria" type="text" value="${escapeHtml(product?.categoria || '')}" placeholder="Ej. Bebidas"
+                           class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-sm">
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-600 mb-1">Costo ($)</label>
+                        <input id="m-costo" type="number" step="0.01" min="0" value="${product?.costo ?? 0}"
+                               class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-sm">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-600 mb-1">Precio ($)</label>
+                        <input id="m-precio" type="number" step="0.01" min="0" value="${product?.precio ?? 0}"
+                               class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-sm">
+                    </div>
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-600 mb-1">Stock actual</label>
+                        <input id="m-stock" type="number" min="0" value="${product?.stock ?? 0}"
+                               class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-sm">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-600 mb-1">Stock mínimo</label>
+                        <input id="m-minimo" type="number" min="0" value="${product?.minimo ?? 0}"
+                               class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-sm">
+                    </div>
+                </div>
+            `;
+
+            openModal(isEdit ? 'Editar Producto · PymeSync' : 'Nuevo Producto · PymeSync', html, async () => {
+                const nombre = document.getElementById('m-nombre').value.trim();
+                if (!nombre) {
+                    showToast('Datos incompletos', 'Ingresa el nombre del producto.', 'warning');
+                    return;
+                }
+                const payload = {
+                    id: isEdit ? Number(product.id) : 0,
+                    codigo: document.getElementById('m-codigo').value.trim(),
+                    nombre,
+                    categoria: document.getElementById('m-categoria').value.trim() || 'General',
+                    costo: parseFloat(document.getElementById('m-costo').value) || 0,
+                    precio: parseFloat(document.getElementById('m-precio').value) || 0,
+                    stock: parseInt(document.getElementById('m-stock').value, 10) || 0,
+                    minimo: parseInt(document.getElementById('m-minimo').value, 10) || 0
+                };
+                try {
+                    await apiCall('product_save', payload);
+                    closeModal();
+                    showToast(isEdit ? 'Producto actualizado' : 'Producto agregado', `${payload.nombre} guardado en SQLite.`);
+                    renderPage('productos');
+                } catch (err) {
+                    showToast('Error', err.message, 'error');
+                }
+            });
+        }
+
+        function renderProductos(container) {
+            const addBtnHtml = `
+                <button id="prod-add-btn" class="btn-primary-gradient text-white rounded-xl px-4 py-2.5 text-sm font-bold flex items-center gap-2 transition cursor-pointer">
+                    <i class="ph-bold ph-plus"></i><span>Agregar producto</span>
+                </button>
+            `;
+
+            container.innerHTML = `
+                ${sectionHeaderHtml('ph-package', 'Catálogo de Productos', 'Administra catálogo, códigos de barras, costos, precios y existencias', addBtnHtml)}
+
+                <div class="bg-white border border-[#dbe4f0] rounded-2xl p-4 shadow-xs mb-5 flex flex-col sm:flex-row gap-3">
+                    <div class="relative flex-1">
+                        <i class="ph-bold ph-magnifying-glass text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2"></i>
+                        <input id="prod-search" type="text" value="${escapeHtml(productSearchText)}"
+                               placeholder="Buscar por nombre, código de barras o categoría..."
+                               class="w-full bg-slate-50 border-[1.5px] border-slate-300 rounded-xl pl-10 pr-4 py-2.5 text-sm font-medium focus:outline-none focus:border-brand-cyan focus:bg-white">
+                    </div>
+                    <button id="prod-edit-btn"
+                            class="bg-white text-brand-blue border-[1.5px] border-brand-blue hover:bg-brand-blueLight hover:border-brand-cyan rounded-xl px-4 py-2.5 text-sm font-bold flex items-center justify-center gap-2 transition cursor-pointer">
+                        <i class="ph-bold ph-pencil-simple"></i>
+                        <span>Editar seleccionado</span>
+                    </button>
+                </div>
+
+                <div class="bg-white border border-[#dbe4f0] rounded-2xl p-5 shadow-xs">
+                    <div class="overflow-x-auto border border-slate-200 rounded-xl">
+                        <table class="w-full text-sm text-left">
+                            <thead class="bg-[#f0f7ff] text-brand-blue text-xs font-extrabold border-b-2 border-brand-cyan">
+                                <tr>
+                                    <th class="px-4 py-3">Código</th>
+                                    <th class="px-4 py-3">Producto</th>
+                                    <th class="px-4 py-3">Categoría</th>
+                                    <th class="px-4 py-3 text-right">Costo</th>
+                                    <th class="px-4 py-3 text-right">Precio</th>
+                                    <th class="px-4 py-3 text-center">Stock</th>
+                                    <th class="px-4 py-3 text-center">Mínimo</th>
+                                </tr>
+                            </thead>
+                            <tbody id="prod-tbody" class="divide-y divide-slate-100"></tbody>
+                        </table>
+                    </div>
+                </div>
+            `;
+
+            function paintRows() {
+                const query = productSearchText.trim().toLowerCase();
+                const list = state.products.filter(p =>
+                    p.nombre.toLowerCase().includes(query) ||
+                    p.codigo.toLowerCase().includes(query) ||
+                    p.categoria.toLowerCase().includes(query)
+                );
+                const tbody = document.getElementById('prod-tbody');
+                tbody.innerHTML = list.length ? list.map(p => {
+                    const isSel = Number(p.id) === Number(selectedProductId);
+                    const lowStock = Number(p.stock) <= Number(p.minimo);
+                    return `
+                        <tr data-prod-id="${p.id}" class="prod-row cursor-pointer transition ${isSel ? 'bg-brand-cyanLight font-bold text-brand-blue' : 'odd:bg-white even:bg-slate-50/70 hover:bg-brand-cyanLight/60'}">
+                            <td class="px-4 py-2.5 font-mono text-xs text-slate-600">${escapeHtml(p.codigo)}</td>
+                            <td class="px-4 py-2.5 font-semibold text-slate-800">${escapeHtml(p.nombre)}</td>
+                            <td class="px-4 py-2.5 text-slate-600">${escapeHtml(p.categoria)}</td>
+                            <td class="px-4 py-2.5 text-right font-bold text-brand-blue">${formatMoney(p.costo)}</td>
+                            <td class="px-4 py-2.5 text-right font-extrabold text-brand-blue">${formatMoney(p.precio)}</td>
+                            <td class="px-4 py-2.5 text-center font-extrabold ${lowStock ? 'text-amber-600' : 'text-slate-800'}">${p.stock}</td>
+                            <td class="px-4 py-2.5 text-center text-slate-600">${p.minimo}</td>
+                        </tr>
+                    `;
+                }).join('') : `
+                    <tr><td colspan="7" class="px-4 py-8 text-center text-slate-400 font-medium">No se encontraron productos con ese criterio.</td></tr>
+                `;
+
+                document.querySelectorAll('.prod-row').forEach(row => {
+                    row.addEventListener('click', () => {
+                        selectedProductId = Number(row.dataset.prodId);
+                        paintRows();
+                    });
+                    row.addEventListener('dblclick', () => {
+                        const p = getProduct(row.dataset.prodId);
+                        if (p) openProductModal(p);
+                    });
+                });
+            }
+
+            paintRows();
+            document.getElementById('prod-search').addEventListener('input', (e) => {
+                productSearchText = e.target.value;
+                paintRows();
+            });
+            document.getElementById('prod-add-btn').addEventListener('click', () => openProductModal(null));
+            document.getElementById('prod-edit-btn').addEventListener('click', () => {
+                const p = getProduct(selectedProductId);
+                if (!p) {
+                    showToast('Selección requerida', 'Selecciona un producto de la tabla para editarlo.', 'warning');
+                    return;
+                }
+                openProductModal(p);
+            });
+        }
+
+        function renderInventario(container) {
+            container.innerHTML = `
+                ${sectionHeaderHtml('ph-clipboard-text', 'Control de Inventario', 'Consulta niveles de stock y registra entradas de mercancía')}
+
+                <div class="bg-white border border-[#dbe4f0] rounded-2xl p-4 sm:p-5 shadow-xs mb-5">
+                    <div class="grid grid-cols-1 md:grid-cols-12 gap-3 items-end">
+                        <div class="md:col-span-6">
+                            <label class="block text-xs font-bold text-slate-600 mb-1">Producto</label>
+                            <select id="inv-product"
+                                    class="w-full bg-slate-50 border-[1.5px] border-slate-300 rounded-xl px-3 py-2.5 text-sm font-semibold text-slate-900 focus:outline-none focus:border-brand-cyan focus:bg-white">
+                                ${state.products.map(p => `<option value="${p.id}">${escapeHtml(p.nombre)}</option>`).join('')}
+                            </select>
+                        </div>
+                        <div class="md:col-span-3">
+                            <label class="block text-xs font-bold text-slate-600 mb-1">Cantidad a ingresar</label>
+                            <input id="inv-qty" type="number" min="1" value="10"
+                                   class="w-full bg-slate-50 border-[1.5px] border-slate-300 rounded-xl px-3 py-2.5 text-sm font-bold text-slate-900 focus:outline-none focus:border-brand-cyan focus:bg-white">
+                        </div>
+                        <div class="md:col-span-3">
+                            <button id="inv-add-btn"
+                                    class="w-full btn-primary-gradient text-white font-bold py-2.5 px-4 rounded-xl flex items-center justify-center gap-2 transition cursor-pointer">
+                                <i class="ph-bold ph-plus"></i>
+                                <span>Registrar entrada</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white border border-[#dbe4f0] rounded-2xl p-5 shadow-xs">
+                    <div class="overflow-x-auto border border-slate-200 rounded-xl">
+                        <table class="w-full text-sm text-left">
+                            <thead class="bg-[#f0f7ff] text-brand-blue text-xs font-extrabold border-b-2 border-brand-cyan">
+                                <tr>
+                                    <th class="px-4 py-3">Producto</th>
+                                    <th class="px-4 py-3">Categoría</th>
+                                    <th class="px-4 py-3 text-center">Stock actual</th>
+                                    <th class="px-4 py-3 text-center">Stock mínimo</th>
+                                    <th class="px-4 py-3 text-right">Precio</th>
+                                    <th class="px-4 py-3 text-center">Estado</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-100">
+                                ${state.products.map(p => {
+                                    const status = p.stock === 0 ? 'Agotado' : (p.stock <= p.minimo ? 'Stock bajo' : 'Disponible');
+                                    return `
+                                        <tr class="odd:bg-white even:bg-slate-50/70 hover:bg-brand-cyanLight/60 transition">
+                                            <td class="px-4 py-2.5 font-semibold text-slate-800">${escapeHtml(p.nombre)}</td>
+                                            <td class="px-4 py-2.5 text-slate-600">${escapeHtml(p.categoria)}</td>
+                                            <td class="px-4 py-2.5 text-center font-bold">${p.stock}</td>
+                                            <td class="px-4 py-2.5 text-center text-slate-600">${p.minimo}</td>
+                                            <td class="px-4 py-2.5 text-right font-extrabold text-brand-blue">${formatMoney(p.precio)}</td>
+                                            <td class="px-4 py-2.5 text-center">${badgeForValue(status)}</td>
+                                        </tr>
+                                    `;
+                                }).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            `;
+
+            document.getElementById('inv-add-btn').addEventListener('click', async () => {
+                const productId = Number(document.getElementById('inv-product').value);
+                const qty = Math.max(1, parseInt(document.getElementById('inv-qty').value, 10) || 1);
+                try {
+                    await apiCall('stock_add', { product_id: productId, cantidad: qty });
+                    const p = getProduct(productId);
+                    showToast('Inventario actualizado', `Se registraron +${qty} unidades de ${p ? p.nombre : 'producto'} en SQLite.`);
+                    renderInventario(container);
+                } catch (err) {
+                    showToast('Error', err.message, 'error');
+                }
+            });
+        }
+
+        function renderMovimientos(container) {
+            container.innerHTML = `
+                ${sectionHeaderHtml('ph-arrows-clockwise', 'Movimientos de Mercancía', 'Historial sincronizado de entradas, ventas y ajustes de inventario')}
+
+                <div class="bg-white border border-[#dbe4f0] rounded-2xl p-5 shadow-xs">
+                    <div class="overflow-x-auto border border-slate-200 rounded-xl">
+                        <table class="w-full text-sm text-left">
+                            <thead class="bg-[#f0f7ff] text-brand-blue text-xs font-extrabold border-b-2 border-brand-cyan">
+                                <tr>
+                                    <th class="px-4 py-3">Fecha</th>
+                                    <th class="px-4 py-3 text-center">Tipo</th>
+                                    <th class="px-4 py-3">Producto</th>
+                                    <th class="px-4 py-3 text-center">Cantidad</th>
+                                    <th class="px-4 py-3">Detalle</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-100">
+                                ${state.movements.map(m => `
+                                    <tr class="odd:bg-white even:bg-slate-50/70 hover:bg-brand-cyanLight/60 transition">
+                                        <td class="px-4 py-2.5 text-slate-600">${escapeHtml(m.fecha)}</td>
+                                        <td class="px-4 py-2.5 text-center">${badgeForValue(m.tipo)}</td>
+                                        <td class="px-4 py-2.5 font-semibold text-slate-800">${escapeHtml(m.producto)}</td>
+                                        <td class="px-4 py-2.5 text-center font-extrabold ${m.cantidad > 0 ? 'text-brand-cyanDark' : 'text-slate-700'}">
+                                            ${m.cantidad > 0 ? '+' + m.cantidad : m.cantidad}
+                                        </td>
+                                        <td class="px-4 py-2.5 text-slate-600">${escapeHtml(m.detalle)}</td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderProveedores(container) {
+            const addBtn = `
+                <button id="prov-add-btn" class="btn-primary-gradient text-white rounded-xl px-4 py-2.5 text-sm font-bold flex items-center gap-2 transition cursor-pointer">
+                    <i class="ph-bold ph-plus"></i><span>Agregar proveedor</span>
+                </button>
+            `;
+
+            container.innerHTML = `
+                ${sectionHeaderHtml('ph-truck', 'Directorio de Proveedores', 'Administra contactos, teléfonos y surtidores de tu tienda', addBtn)}
+
+                <div class="bg-white border border-[#dbe4f0] rounded-2xl p-5 shadow-xs">
+                    <div class="overflow-x-auto border border-slate-200 rounded-xl">
+                        <table class="w-full text-sm text-left">
+                            <thead class="bg-[#f0f7ff] text-brand-blue text-xs font-extrabold border-b-2 border-brand-cyan">
+                                <tr>
+                                    <th class="px-4 py-3">Proveedor</th>
+                                    <th class="px-4 py-3">Contacto</th>
+                                    <th class="px-4 py-3">Teléfono</th>
+                                    <th class="px-4 py-3">Productos que surte</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-100">
+                                ${state.providers.map(pr => `
+                                    <tr class="odd:bg-white even:bg-slate-50/70 hover:bg-brand-cyanLight/60 transition">
+                                        <td class="px-4 py-2.5 font-bold text-brand-blue">${escapeHtml(pr.nombre)}</td>
+                                        <td class="px-4 py-2.5 font-semibold text-slate-800">${escapeHtml(pr.contacto)}</td>
+                                        <td class="px-4 py-2.5 font-mono text-xs text-slate-700">${escapeHtml(pr.telefono)}</td>
+                                        <td class="px-4 py-2.5 text-slate-600">${escapeHtml(pr.productos)}</td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            `;
+
+            document.getElementById('prov-add-btn').addEventListener('click', () => {
+                openModal('Nuevo proveedor · PymeSync', `
+                    <div>
+                        <label class="block text-xs font-bold text-slate-600 mb-1">Proveedor *</label>
+                        <input id="p-nombre" type="text" required placeholder="Ej. Refresquera del Centro" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-sm">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-600 mb-1">Contacto</label>
+                        <input id="p-contacto" type="text" placeholder="Nombre del representante" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-sm">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-600 mb-1">Teléfono</label>
+                        <input id="p-telefono" type="text" placeholder="449 000 0000" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-sm">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-600 mb-1">Productos que surte</label>
+                        <input id="p-productos" type="text" placeholder="Bebidas, lácteos, etc." class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-sm">
+                    </div>
+                `, async () => {
+                    const nombre = document.getElementById('p-nombre').value.trim();
+                    if (!nombre) {
+                        showToast('Datos incompletos', 'Ingresa el nombre del proveedor.', 'warning');
+                        return;
+                    }
+                    try {
+                        await apiCall('provider_add', {
+                            nombre,
+                            contacto: document.getElementById('p-contacto').value.trim(),
+                            telefono: document.getElementById('p-telefono').value.trim(),
+                            productos: document.getElementById('p-productos').value.trim()
+                        });
+                        closeModal();
+                        showToast('Proveedor registrado', `${nombre} guardado en SQLite.`);
+                        renderProveedores(container);
+                    } catch (err) {
+                        showToast('Error', err.message, 'error');
+                    }
+                });
+            });
+        }
+
+        function renderReportes(container) {
+            const totalIncome = state.sales.reduce((acc, s) => acc + Number(s.total), 0);
+            const salesCount = state.sales.length;
+            const avgTicket = salesCount ? totalIncome / salesCount : 0;
+            const invValue = state.products.reduce((acc, p) => acc + (Number(p.costo) * Number(p.stock)), 0);
+            const allSales = [...state.sales].reverse();
+
+            container.innerHTML = `
+                ${sectionHeaderHtml('ph-chart-bar', 'Reportes Financieros y de Ventas', 'Consulta ingresos acumulados, ticket promedio e historial detallado')}
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 mb-5">
+                    ${statCardHtml('Ingresos acumulados', formatMoney(totalIncome), 'Total histórico de ventas', 'ph-money', 'blue')}
+                    ${statCardHtml('Ventas registradas', String(salesCount), 'Tickets emitidos', 'ph-shopping-cart', 'cyan')}
+                    ${statCardHtml('Ticket promedio', formatMoney(avgTicket), 'Promedio por operación', 'ph-chart-bar', 'blue')}
+                    ${statCardHtml('Valor de inventario', formatMoney(invValue), 'Capital en mercancía (al costo)', 'ph-clipboard-text', 'cyan')}
+                </div>
+
+                <div class="bg-white border border-[#dbe4f0] rounded-2xl p-5 shadow-xs">
+                    <div class="overflow-x-auto border border-slate-200 rounded-xl">
+                        <table class="w-full text-sm text-left">
+                            <thead class="bg-[#f0f7ff] text-brand-blue text-xs font-extrabold border-b-2 border-brand-cyan">
+                                <tr>
+                                    <th class="px-4 py-3">Folio</th>
+                                    <th class="px-4 py-3">Fecha</th>
+                                    <th class="px-4 py-3 text-center">Productos</th>
+                                    <th class="px-4 py-3 text-right">Total</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-100">
+                                ${allSales.map(s => `
+                                    <tr class="odd:bg-white even:bg-slate-50/70 hover:bg-brand-cyanLight/60 transition">
+                                        <td class="px-4 py-2.5 font-extrabold text-brand-blue font-mono">${escapeHtml(s.folio)}</td>
+                                        <td class="px-4 py-2.5 text-slate-600">${formatDateTime(s.fecha)}</td>
+                                        <td class="px-4 py-2.5 text-center font-semibold">${s.productos}</td>
+                                        <td class="px-4 py-2.5 text-right font-extrabold text-brand-blue">${formatMoney(s.total)}</td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderAdmin(container) {
+            const addBtn = `
+                <button id="usr-add-btn" class="btn-primary-gradient text-white rounded-xl px-4 py-2.5 text-sm font-bold flex items-center gap-2 transition cursor-pointer">
+                    <i class="ph-bold ph-plus"></i><span>Nuevo usuario</span>
+                </button>
+            `;
+
+            container.innerHTML = `
+                ${sectionHeaderHtml('ph-users-three', 'Administración de Usuarios', 'Gestiona el personal, cajeros y permisos de acceso al sistema', addBtn)}
+
+                <div class="bg-white border border-[#dbe4f0] rounded-2xl p-5 shadow-xs">
+                    <div class="overflow-x-auto border border-slate-200 rounded-xl">
+                        <table class="w-full text-sm text-left">
+                            <thead class="bg-[#f0f7ff] text-brand-blue text-xs font-extrabold border-b-2 border-brand-cyan">
+                                <tr>
+                                    <th class="px-4 py-3">Nombre</th>
+                                    <th class="px-4 py-3">Usuario</th>
+                                    <th class="px-4 py-3">Rol</th>
+                                    <th class="px-4 py-3 text-center">Estado</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-100">
+                                ${state.users.map(u => `
+                                    <tr class="odd:bg-white even:bg-slate-50/70 hover:bg-brand-cyanLight/60 transition">
+                                        <td class="px-4 py-2.5 font-semibold text-slate-800">${escapeHtml(u.nombre)}</td>
+                                        <td class="px-4 py-2.5 font-mono text-xs text-brand-blue font-bold">${escapeHtml(u.usuario)}</td>
+                                        <td class="px-4 py-2.5 text-slate-700">${escapeHtml(u.rol)}</td>
+                                        <td class="px-4 py-2.5 text-center">${badgeForValue(u.estado)}</td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            `;
+
+            document.getElementById('usr-add-btn').addEventListener('click', () => {
+                openModal('Nuevo usuario · PymeSync', `
+                    <div>
+                        <label class="block text-xs font-bold text-slate-600 mb-1">Nombre *</label>
+                        <input id="u-nombre" type="text" required placeholder="Nombre completo" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-sm">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-600 mb-1">Usuario *</label>
+                        <input id="u-usuario" type="text" required placeholder="ej. caja2" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-sm">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-600 mb-1">Contraseña *</label>
+                        <input id="u-pass" type="password" required placeholder="••••••••" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-sm">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-600 mb-1">Rol</label>
+                        <select id="u-rol" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-sm">
+                            <option value="Administrador">Administrador</option>
+                            <option value="Cajero">Cajero</option>
+                            <option value="Encargado">Encargado</option>
+                        </select>
+                    </div>
+                `, async () => {
+                    const nombre = document.getElementById('u-nombre').value.trim();
+                    const usuario = document.getElementById('u-usuario').value.trim();
+                    const password = document.getElementById('u-pass').value;
+                    const rol = document.getElementById('u-rol').value;
+                    if (!nombre || !usuario || !password) {
+                        showToast('Datos incompletos', 'Completa todos los datos del usuario.', 'warning');
+                        return;
+                    }
+                    try {
+                        await apiCall('user_add', { nombre, usuario, password, rol });
+                        closeModal();
+                        showToast('Usuario registrado', `${nombre} (${usuario}) guardado con contraseña cifrada en SQLite.`);
+                        renderAdmin(container);
+                    } catch (err) {
+                        showToast('Error', err.message, 'error');
+                    }
+                });
+            });
+        }
+
+        function renderConfiguracion(container) {
+            const cfg = state.config || {};
+            const info = state.server_info || {};
+            container.innerHTML = `
+                ${sectionHeaderHtml('ph-sliders-horizontal', 'Configuración del Negocio', 'Datos generales de tu tienda, estado del servidor PHP y preferencias')}
+
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
+                    <div class="lg:col-span-2 bg-white border border-[#dbe4f0] rounded-2xl p-6 sm:p-7 shadow-xs">
+                        <form id="cfg-form" class="space-y-4">
+                            <div class="pb-3 border-b border-slate-100 flex items-center justify-between flex-wrap gap-2">
+                                <div>
+                                    <div class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Identidad corporativa</div>
+                                    <img src="logo_horizontal_clean.png" alt="PymeSync" class="h-10 w-auto logo-clean-crop">
+                                </div>
+                                <span class="bg-brand-cyanLight text-brand-cyanDark border border-teal-200 rounded-lg px-3 py-1 text-xs font-extrabold">
+                                    «Tu tiendita, bien chidita»
+                                </span>
+                            </div>
+
+                            <div>
+                                <label class="block text-xs font-bold text-slate-600 mb-1">Nombre de la tienda</label>
+                                <input id="cfg-store" type="text" value="${escapeHtml(cfg.storeName || '')}"
+                                       class="w-full bg-slate-50 border-[1.5px] border-slate-300 rounded-xl px-3.5 py-2.5 text-sm font-semibold focus:outline-none focus:border-brand-cyan focus:bg-white">
+                            </div>
+
+                            <div>
+                                <label class="block text-xs font-bold text-slate-600 mb-1">Propietario</label>
+                                <input id="cfg-owner" type="text" value="${escapeHtml(cfg.owner || '')}"
+                                       class="w-full bg-slate-50 border-[1.5px] border-slate-300 rounded-xl px-3.5 py-2.5 text-sm font-semibold focus:outline-none focus:border-brand-cyan focus:bg-white">
+                            </div>
+
+                            <div>
+                                <label class="block text-xs font-bold text-slate-600 mb-1">Teléfono / WhatsApp</label>
+                                <input id="cfg-phone" type="text" value="${escapeHtml(cfg.phone || '')}"
+                                       class="w-full bg-slate-50 border-[1.5px] border-slate-300 rounded-xl px-3.5 py-2.5 text-sm font-semibold focus:outline-none focus:border-brand-cyan focus:bg-white">
+                            </div>
+
+                            <div>
+                                <label class="block text-xs font-bold text-slate-600 mb-1">Moneda</label>
+                                <select id="cfg-currency"
+                                        class="w-full bg-slate-50 border-[1.5px] border-slate-300 rounded-xl px-3.5 py-2.5 text-sm font-semibold focus:outline-none focus:border-brand-cyan focus:bg-white">
+                                    <option value="MXN - Peso mexicano" ${cfg.currency === 'MXN - Peso mexicano' ? 'selected' : ''}>MXN - Peso mexicano</option>
+                                    <option value="USD - Dólar" ${cfg.currency === 'USD - Dólar' ? 'selected' : ''}>USD - Dólar</option>
+                                </select>
+                            </div>
+
+                            <div class="pt-2 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
+                                <button type="submit"
+                                        class="btn-primary-gradient text-white rounded-xl px-5 py-2.5 text-sm font-bold flex items-center justify-center gap-2 transition cursor-pointer">
+                                    <i class="ph-bold ph-check"></i>
+                                    <span>Guardar configuración</span>
+                                </button>
+
+                                <button id="cfg-reset-btn" type="button"
+                                        class="bg-white text-brand-blue border-[1.5px] border-brand-blue hover:bg-brand-blueLight hover:border-brand-cyan rounded-xl px-4 py-2.5 text-sm font-bold flex items-center justify-center gap-2 transition cursor-pointer">
+                                    <i class="ph-bold ph-arrow-counter-clockwise"></i>
+                                    <span>Restaurar datos demo</span>
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <div class="bg-white border border-[#dbe4f0] rounded-2xl p-6 shadow-xs space-y-4 h-fit">
+                        <h3 class="text-base font-extrabold text-brand-blue flex items-center gap-2">
+                            <i class="ph-bold ph-hard-drives text-brand-cyanDark"></i>
+                            <span>Nodo Servidor Local</span>
+                        </h3>
+                        <div class="space-y-2.5 text-xs">
+                            <div class="p-3 rounded-xl bg-brand-cyanLight border border-teal-200">
+                                <div class="font-extrabold text-brand-cyanDark">● Servidor Activo</div>
+                                <div class="text-slate-700 font-semibold mt-0.5">${escapeHtml(info.engine || 'PHP + SQLite3')}</div>
+                            </div>
+                            <div class="flex justify-between py-1.5 border-b border-slate-100">
+                                <span class="text-slate-500 font-semibold">Host de máquina:</span>
+                                <span class="font-mono font-bold text-brand-blue">${escapeHtml(info.host || 'localhost')}</span>
+                            </div>
+                            <div class="flex justify-between py-1.5 border-b border-slate-100">
+                                <span class="text-slate-500 font-semibold">Base de datos:</span>
+                                <span class="font-mono font-bold text-slate-700">data/pymesync.sqlite</span>
+                            </div>
+                            <div class="flex justify-between py-1.5">
+                                <span class="text-slate-500 font-semibold">API REST:</span>
+                                <span class="font-mono font-bold text-brand-cyanDark">api.php</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            document.getElementById('cfg-form').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                try {
+                    await apiCall('config_save', {
+                        storeName: document.getElementById('cfg-store').value.trim(),
+                        owner: document.getElementById('cfg-owner').value.trim(),
+                        phone: document.getElementById('cfg-phone').value.trim(),
+                        currency: document.getElementById('cfg-currency').value
+                    });
+                    showToast('Configuración guardada', 'La configuración fue guardada en SQLite correctamente.');
+                } catch (err) {
+                    showToast('Error', err.message, 'error');
+                }
+            });
+
+            document.getElementById('cfg-reset-btn').addEventListener('click', async () => {
+                try {
+                    await apiCall('reset_demo', {});
+                    cart = [];
+                    selectedCartIndex = -1;
+                    selectedProductId = null;
+                    showToast('Datos restaurados', 'La base de datos SQLite regresó al estado demo inicial.');
+                    renderConfiguracion(container);
+                } catch (err) {
+                    showToast('Error', err.message, 'error');
+                }
+            });
+        }
+
+        function showApp(user) {
+            currentUser = user;
+            document.getElementById('topbar-user-name').textContent = user.nombre || 'Administrador';
+            document.getElementById('topbar-user-role').textContent = `${user.rol || 'Administrador'} · PymeSync`;
+            document.getElementById('login-view').classList.add('hidden');
+            document.getElementById('app-view').classList.remove('hidden');
+            renderPage('dashboard');
+        }
+
+        function showLogin() {
+            currentUser = null;
+            document.getElementById('app-view').classList.add('hidden');
+            document.getElementById('login-view').classList.remove('hidden');
+        }
+
+        document.getElementById('login-show-pass').addEventListener('change', (e) => {
+            document.getElementById('login-pass').type = e.target.checked ? 'text' : 'password';
+        });
+
+        document.getElementById('demo-fill-btn').addEventListener('click', () => {
+            document.getElementById('login-user').value = 'admin';
+            document.getElementById('login-pass').value = 'admin123';
+            document.getElementById('login-error').classList.add('hidden');
+        });
+
+        document.getElementById('login-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const usuario = document.getElementById('login-user').value.trim();
+            const password = document.getElementById('login-pass').value;
+            const errEl = document.getElementById('login-error');
+
+            try {
+                const res = await apiCall('login', { usuario, password });
+                errEl.classList.add('hidden');
+                showApp(res.user);
+            } catch (err) {
+                errEl.textContent = err.message || 'Usuario o contraseña incorrectos.';
+                errEl.classList.remove('hidden');
+            }
+        });
+
+        document.getElementById('logout-btn').addEventListener('click', async () => {
+            try { await apiCall('logout', {}); } catch (e) {}
+            showLogin();
+        });
+
+        const sidebarEl = document.getElementById('sidebar');
+        const overlayEl = document.getElementById('mobile-overlay');
+
+        function toggleMobileSidebar(open) {
+            if (open) {
+                sidebarEl.classList.remove('-translate-x-full');
+                overlayEl.classList.remove('hidden');
+            } else {
+                sidebarEl.classList.add('-translate-x-full');
+                overlayEl.classList.add('hidden');
+            }
+        }
+
+        document.getElementById('mobile-menu-btn').addEventListener('click', () => toggleMobileSidebar(true));
+        overlayEl.addEventListener('click', () => toggleMobileSidebar(false));
+
+        document.querySelectorAll('.nav-item').forEach(btn => {
+            btn.addEventListener('click', () => {
+                renderPage(btn.dataset.page);
+                toggleMobileSidebar(false);
+            });
+        });
+
+        if (currentUser) {
+            showApp(currentUser);
+        }
+    </script>
+</body>
+</html>

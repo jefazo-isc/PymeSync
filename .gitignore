@@ -1,3 +1,14 @@
+# Base de datos SQLite local (se genera automáticamente en cada máquina)
+data/
+*.sqlite
+*.sqlite3
+
+# Archivos Python anteriores y estilos Qt (el proyecto migró a PHP)
+*.py
+*.qss
+segundo video/
+integradora/
+
 # Archivos multimedia pesados y respaldos
 *.mp4
 *.wav
@@ -11,21 +22,12 @@
 *.ods
 *.xlsx
 
-# Carpetas de edición de video y entregables escolares
-segundo video/edicion/
-segundo video/despidoIA/
-segundo video/*.jpeg
-segundo video/Tiendita/Tiendita/
-integradora/
-
 # Imágenes temporales de pruebas de canvas
 card_*.png
 pymesync_canvas.png
 pymesync_canvas_.png
-test_*.py
-generate_canvas.py
 
-# Entornos virtuales y caché de Python
+# Entornos virtuales y caché
 .venv/
 venv/
 __pycache__/
