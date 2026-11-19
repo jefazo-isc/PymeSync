@@ -1,0 +1,18 @@
+.git
+.gitignore
+data/
+*.mp4
+*.wav
+*.zip
+*.docx
+*.pptx
+*.pdf
+*.ods
+*.xlsx
+*.py
+*.qss
+segundo video/
+integradora/
+.venv/
+venv/
+__pycache__/

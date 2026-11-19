@@ -102,9 +102,6 @@
                     <span class="inline-block bg-brand-cyan/20 text-[#5eead4] border border-brand-cyan rounded-lg px-3 py-1.5 text-xs font-extrabold tracking-wide">
                         «TU TIENDITA, BIEN CHIDITA» · SaaS B2B
                     </span>
-                    <span id="login-server-badge" class="inline-block bg-white/10 text-slate-200 border border-white/25 rounded-lg px-3 py-1.5 text-xs font-bold">
-                        Detectando servidor PHP local...
-                    </span>
                 </div>
             </div>
 
@@ -113,7 +110,7 @@
                     El control total de tu negocio, sin complicaciones
                 </h1>
                 <p class="text-slate-200 text-base leading-relaxed">
-                    Controla ventas, inventario, precios, entradas, proveedores y reportes desde una interfaz simple, conectada a tu servidor PHP + SQLite local o en modo demo autónomo.
+                    Controla ventas, inventario, precios, entradas, proveedores y reportes desde una interfaz simple, coherente y profesional.
                 </p>
                 <div class="space-y-2.5 pt-2 text-sm font-semibold text-teal-50">
                     <div class="flex items-center gap-2.5">
@@ -126,7 +123,7 @@
                     </div>
                     <div class="flex items-center gap-2.5">
                         <i class="ph-bold ph-check-circle text-brand-cyan text-lg"></i>
-                        <span>Conecta GitHub Pages directo a tu servidor PHP local</span>
+                        <span>Funciona en la nube o de forma local sin complicaciones</span>
                     </div>
                 </div>
             </div>
@@ -180,17 +177,12 @@
                     </button>
                 </form>
 
-                <div class="mt-5 pt-4 border-t border-slate-100 flex items-center justify-between text-xs">
+                <div class="mt-5 pt-4 border-t border-slate-100 text-center text-xs">
                     <a href="pymesync_canvas.html" target="_blank"
                        class="inline-flex items-center gap-1.5 font-bold text-brand-cyanDark hover:text-brand-blue transition">
                         <i class="ph-bold ph-presentation-chart"></i>
-                        <span>Business Model Canvas</span>
+                        <span>Ver Business Model Canvas</span>
                     </a>
-                    <button id="login-reconnect-btn" type="button"
-                            class="inline-flex items-center gap-1 font-bold text-brand-blue hover:text-brand-cyanDark cursor-pointer">
-                        <i class="ph-bold ph-plugs-connected"></i>
-                        <span>Reconectar PHP</span>
-                    </button>
                 </div>
             </div>
         </div>
@@ -248,15 +240,12 @@
 
             <div class="mt-4 space-y-2">
                 <div class="bg-brand-blue/35 border border-brand-cyan/30 rounded-xl px-3 py-2.5">
-                    <div id="sidebar-conn-status" class="text-[11px] font-extrabold text-[#5eead4] flex items-center gap-1.5">
+                    <div class="text-[11px] font-extrabold text-[#5eead4] flex items-center gap-1.5">
                         <span>●</span>
-                        <span>Conectando...</span>
+                        <span>Sistema Activo · PymeSync</span>
                     </div>
-                    <div class="text-[11px] text-slate-400 mt-0.5 flex items-center justify-between gap-2">
-                        <span>PymeSync SaaS</span>
-                        <button id="sidebar-reconnect-btn" type="button" class="text-[10px] font-bold text-[#5eead4] underline hover:text-white cursor-pointer">
-                            Reconectar PHP
-                        </button>
+                    <div class="text-[11px] text-slate-400 mt-0.5">
+                        PymeSync SaaS · Equipo 3 UAA
                     </div>
                 </div>
                 <button id="logout-btn"
@@ -455,42 +444,18 @@
             configuracion: { title: 'Configuración', icon: 'ph-sliders-horizontal' }
         };
 
-        function updateConnectionBadges() {
-            const loginBadge = document.getElementById('login-server-badge');
-            const sidebarStatus = document.getElementById('sidebar-conn-status');
-            if (phpApiUrl) {
-                const eng = state?.server_info?.engine || 'PHP + SQLite';
-                loginBadge.className = 'inline-block bg-emerald-400/20 text-[#5eead4] border border-emerald-400/50 rounded-lg px-3 py-1.5 text-xs font-extrabold';
-                loginBadge.textContent = `● ${eng} Conectado`;
-                sidebarStatus.className = 'text-[11px] font-extrabold text-[#5eead4] flex items-center gap-1.5';
-                sidebarStatus.innerHTML = `<span>●</span><span>Servidor PHP + SQLite Conectado</span>`;
-            } else {
-                loginBadge.className = 'inline-block bg-white/10 text-slate-200 border border-white/25 rounded-lg px-3 py-1.5 text-xs font-bold';
-                loginBadge.textContent = 'Modo Local Navegador (Sin Servidor PHP)';
-                sidebarStatus.className = 'text-[11px] font-extrabold text-amber-300 flex items-center gap-1.5';
-                sidebarStatus.innerHTML = `<span>●</span><span>Modo Demo Local (Offline)</span>`;
-            }
-        }
-
-        async function probePhpServer(customUrl = null) {
-            const candidates = customUrl
-                ? [customUrl]
-                : (window.location.protocol.startsWith('http') && !window.location.hostname.endsWith('github.io')
-                    ? ['./api.php', configuredServerUrl]
-                    : [configuredServerUrl]);
-
-            for (const url of candidates) {
+        async function probePhpServer() {
+            if (window.location.protocol.startsWith('http') && !window.location.hostname.endsWith('github.io')) {
                 try {
                     const controller = new AbortController();
-                    const timer = setTimeout(() => controller.abort(), 1600);
-                    const resp = await fetch(`${url}?action=ping`, { signal: controller.signal });
+                    const timer = setTimeout(() => controller.abort(), 1400);
+                    const resp = await fetch('./api.php?action=ping', { signal: controller.signal });
                     clearTimeout(timer);
                     if (resp.ok) {
                         const data = await resp.json();
                         if (data && data.ok && data.state) {
-                            phpApiUrl = url;
+                            phpApiUrl = './api.php';
                             state = data.state;
-                            updateConnectionBadges();
                             return true;
                         }
                     }
@@ -498,7 +463,6 @@
             }
             phpApiUrl = null;
             state = loadLocalState();
-            updateConnectionBadges();
             return false;
         }
 
@@ -1474,83 +1438,61 @@
         function renderConfiguracion(container) {
             const cfg = state.config || buildDefaultState().config;
             container.innerHTML = `
-                ${sectionHeaderHtml('ph-sliders-horizontal', 'Configuración del Negocio', 'Datos generales de tu tienda y conexión al servidor PHP local')}
+                ${sectionHeaderHtml('ph-sliders-horizontal', 'Configuración del Negocio', 'Datos generales de tu tienda y preferencias de PymeSync')}
 
-                <div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
-                    <div class="lg:col-span-2 bg-white border border-[#dbe4f0] rounded-2xl p-6 sm:p-7 shadow-xs">
-                        <form id="cfg-form" class="space-y-4">
-                            <div class="pb-3 border-b border-slate-100 flex items-center justify-between flex-wrap gap-2">
-                                <div>
-                                    <div class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Identidad corporativa</div>
-                                    <img src="logo_horizontal_clean.png" alt="PymeSync" class="h-10 w-auto logo-clean-crop">
-                                </div>
-                                <span class="bg-brand-cyanLight text-brand-cyanDark border border-teal-200 rounded-lg px-3 py-1 text-xs font-extrabold">
-                                    «Tu tiendita, bien chidita»
-                                </span>
-                            </div>
-
+                <div class="bg-white border border-[#dbe4f0] rounded-2xl p-6 sm:p-7 shadow-xs max-w-2xl">
+                    <form id="cfg-form" class="space-y-4">
+                        <div class="pb-3 border-b border-slate-100 flex items-center justify-between flex-wrap gap-2">
                             <div>
-                                <label class="block text-xs font-bold text-slate-600 mb-1">Nombre de la tienda</label>
-                                <input id="cfg-store" type="text" value="${escapeHtml(cfg.storeName)}"
-                                       class="w-full bg-slate-50 border-[1.5px] border-slate-300 rounded-xl px-3.5 py-2.5 text-sm font-semibold focus:outline-none focus:border-brand-cyan focus:bg-white">
+                                <div class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Identidad corporativa</div>
+                                <img src="logo_horizontal_clean.png" alt="PymeSync" class="h-10 w-auto logo-clean-crop">
                             </div>
-
-                            <div>
-                                <label class="block text-xs font-bold text-slate-600 mb-1">Propietario</label>
-                                <input id="cfg-owner" type="text" value="${escapeHtml(cfg.owner)}"
-                                       class="w-full bg-slate-50 border-[1.5px] border-slate-300 rounded-xl px-3.5 py-2.5 text-sm font-semibold focus:outline-none focus:border-brand-cyan focus:bg-white">
-                            </div>
-
-                            <div>
-                                <label class="block text-xs font-bold text-slate-600 mb-1">Teléfono / WhatsApp</label>
-                                <input id="cfg-phone" type="text" value="${escapeHtml(cfg.phone)}"
-                                       class="w-full bg-slate-50 border-[1.5px] border-slate-300 rounded-xl px-3.5 py-2.5 text-sm font-semibold focus:outline-none focus:border-brand-cyan focus:bg-white">
-                            </div>
-
-                            <div>
-                                <label class="block text-xs font-bold text-slate-600 mb-1">Moneda</label>
-                                <select id="cfg-currency"
-                                        class="w-full bg-slate-50 border-[1.5px] border-slate-300 rounded-xl px-3.5 py-2.5 text-sm font-semibold focus:outline-none focus:border-brand-cyan focus:bg-white">
-                                    <option value="MXN - Peso mexicano" ${cfg.currency === 'MXN - Peso mexicano' ? 'selected' : ''}>MXN - Peso mexicano</option>
-                                    <option value="USD - Dólar" ${cfg.currency === 'USD - Dólar' ? 'selected' : ''}>USD - Dólar</option>
-                                </select>
-                            </div>
-
-                            <div class="pt-2 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
-                                <button type="submit"
-                                        class="btn-primary-gradient text-white rounded-xl px-5 py-2.5 text-sm font-bold flex items-center justify-center gap-2 transition cursor-pointer">
-                                    <i class="ph-bold ph-check"></i>
-                                    <span>Guardar configuración</span>
-                                </button>
-
-                                <button id="cfg-reset-btn" type="button"
-                                        class="bg-white text-brand-blue border-[1.5px] border-brand-blue hover:bg-brand-blueLight hover:border-brand-cyan rounded-xl px-4 py-2.5 text-sm font-bold flex items-center justify-center gap-2 transition cursor-pointer">
-                                    <i class="ph-bold ph-arrow-counter-clockwise"></i>
-                                    <span>Restaurar datos demo</span>
-                                </button>
-                            </div>
-                        </form>
-                    </div>
-
-                    <div class="bg-white border border-[#dbe4f0] rounded-2xl p-6 shadow-xs space-y-4 h-fit">
-                        <h3 class="text-base font-extrabold text-brand-blue flex items-center gap-2">
-                            <i class="ph-bold ph-plugs-connected text-brand-cyanDark"></i>
-                            <span>Servidor PHP Local</span>
-                        </h3>
-                        <p class="text-xs text-slate-600 leading-relaxed">
-                            Ejecuta <code class="bg-slate-100 px-1.5 py-0.5 rounded font-mono text-brand-blue">./run_server.sh</code> en tu máquina para conectar esta página a tu base de datos SQLite local.
-                        </p>
-                        <div>
-                            <label class="block text-xs font-bold text-slate-600 mb-1">URL del API PHP</label>
-                            <input id="cfg-server-url" type="text" value="${escapeHtml(configuredServerUrl)}"
-                                   class="w-full bg-slate-50 border-[1.5px] border-slate-300 rounded-xl px-3 py-2 text-xs font-mono focus:outline-none focus:border-brand-cyan">
+                            <span class="bg-brand-cyanLight text-brand-cyanDark border border-teal-200 rounded-lg px-3 py-1 text-xs font-extrabold">
+                                «Tu tiendita, bien chidita»
+                            </span>
                         </div>
-                        <button id="cfg-connect-btn" type="button"
-                                class="w-full btn-primary-gradient text-white rounded-xl px-4 py-2 text-xs font-bold flex items-center justify-center gap-2 cursor-pointer">
-                            <i class="ph-bold ph-arrows-clockwise"></i>
-                            <span>Conectar / Reconectar PHP</span>
-                        </button>
-                    </div>
+
+                        <div>
+                            <label class="block text-xs font-bold text-slate-600 mb-1">Nombre de la tienda</label>
+                            <input id="cfg-store" type="text" value="${escapeHtml(cfg.storeName)}"
+                                   class="w-full bg-slate-50 border-[1.5px] border-slate-300 rounded-xl px-3.5 py-2.5 text-sm font-semibold focus:outline-none focus:border-brand-cyan focus:bg-white">
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-bold text-slate-600 mb-1">Propietario</label>
+                            <input id="cfg-owner" type="text" value="${escapeHtml(cfg.owner)}"
+                                   class="w-full bg-slate-50 border-[1.5px] border-slate-300 rounded-xl px-3.5 py-2.5 text-sm font-semibold focus:outline-none focus:border-brand-cyan focus:bg-white">
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-bold text-slate-600 mb-1">Teléfono / WhatsApp</label>
+                            <input id="cfg-phone" type="text" value="${escapeHtml(cfg.phone)}"
+                                   class="w-full bg-slate-50 border-[1.5px] border-slate-300 rounded-xl px-3.5 py-2.5 text-sm font-semibold focus:outline-none focus:border-brand-cyan focus:bg-white">
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-bold text-slate-600 mb-1">Moneda</label>
+                            <select id="cfg-currency"
+                                    class="w-full bg-slate-50 border-[1.5px] border-slate-300 rounded-xl px-3.5 py-2.5 text-sm font-semibold focus:outline-none focus:border-brand-cyan focus:bg-white">
+                                <option value="MXN - Peso mexicano" ${cfg.currency === 'MXN - Peso mexicano' ? 'selected' : ''}>MXN - Peso mexicano</option>
+                                <option value="USD - Dólar" ${cfg.currency === 'USD - Dólar' ? 'selected' : ''}>USD - Dólar</option>
+                            </select>
+                        </div>
+
+                        <div class="pt-2 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
+                            <button type="submit"
+                                    class="btn-primary-gradient text-white rounded-xl px-5 py-2.5 text-sm font-bold flex items-center justify-center gap-2 transition cursor-pointer">
+                                <i class="ph-bold ph-check"></i>
+                                <span>Guardar configuración</span>
+                            </button>
+
+                            <button id="cfg-reset-btn" type="button"
+                                    class="bg-white text-brand-blue border-[1.5px] border-brand-blue hover:bg-brand-blueLight hover:border-brand-cyan rounded-xl px-4 py-2.5 text-sm font-bold flex items-center justify-center gap-2 transition cursor-pointer">
+                                <i class="ph-bold ph-arrow-counter-clockwise"></i>
+                                <span>Restaurar datos demo</span>
+                            </button>
+                        </div>
+                    </form>
                 </div>
             `;
 
@@ -1565,7 +1507,7 @@
                 if (phpApiUrl) {
                     try {
                         await apiCall('config_save', payload);
-                        showToast('Configuración guardada en SQLite', 'La configuración de PymeSync fue guardada.');
+                        showToast('Configuración guardada', 'La configuración de PymeSync fue guardada.');
                     } catch (err) {
                         showToast('Error', err.message, 'error');
                     }
@@ -1581,7 +1523,7 @@
                     try {
                         await apiCall('reset_demo', {});
                         cart = []; selectedCartIndex = -1; selectedProductId = null;
-                        showToast('SQLite restaurado', 'La base de datos regresó al estado demo inicial.');
+                        showToast('Datos restaurados', 'La base de datos regresó al estado demo inicial.');
                         renderConfiguracion(container);
                     } catch (err) {
                         showToast('Error', err.message, 'error');
@@ -1593,20 +1535,6 @@
                 saveLocalState(state);
                 showToast('Datos restaurados', 'El catálogo, ventas y movimientos regresaron al estado demo inicial.');
                 renderConfiguracion(container);
-            });
-
-            document.getElementById('cfg-connect-btn').addEventListener('click', async () => {
-                const url = document.getElementById('cfg-server-url').value.trim();
-                if (!url) return;
-                configuredServerUrl = url;
-                localStorage.setItem(SERVER_URL_KEY, url);
-                const ok = await probePhpServer(url);
-                if (ok) {
-                    showToast('PHP + SQLite Conectado', `Conectado correctamente a ${url}`);
-                    renderConfiguracion(container);
-                } else {
-                    showToast('Servidor no detectado', `No se pudo conectar a ${url}. Asegúrate de correr ./run_server.sh`, 'warning');
-                }
             });
         }
 
@@ -1667,21 +1595,6 @@
             }
             showLogin();
         });
-
-        async function handleManualReconnect() {
-            const ok = await probePhpServer();
-            if (ok) {
-                showToast('PHP + SQLite Conectado', `Sincronizado con ${phpApiUrl}`);
-                if (!document.getElementById('app-view').classList.contains('hidden')) {
-                    renderPage(currentPage);
-                }
-            } else {
-                showToast('Sin conexión PHP', 'Ejecuta ./run_server.sh en tu máquina y vuelve a intentar.', 'warning');
-            }
-        }
-
-        document.getElementById('login-reconnect-btn').addEventListener('click', handleManualReconnect);
-        document.getElementById('sidebar-reconnect-btn').addEventListener('click', handleManualReconnect);
 
         const sidebarEl = document.getElementById('sidebar');
         const overlayEl = document.getElementById('mobile-overlay');
