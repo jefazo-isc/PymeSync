@@ -1,0 +1,33 @@
+# Archivos multimedia pesados y respaldos
+*.mp4
+*.wav
+*.zip
+*.pkt
+
+# Documentos de clase y borradores
+*.docx
+*.pptx
+*.pdf
+*.ods
+*.xlsx
+
+# Carpetas de edición de video y entregables escolares
+segundo video/edicion/
+segundo video/despidoIA/
+segundo video/*.jpeg
+segundo video/Tiendita/Tiendita/
+integradora/
+
+# Imágenes temporales de pruebas de canvas
+card_*.png
+pymesync_canvas.png
+pymesync_canvas_.png
+test_*.py
+generate_canvas.py
+
+# Entornos virtuales y caché de Python
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+.vscode/

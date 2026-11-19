@@ -1,0 +1,667 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Business Model Canvas · PymeSync | Full HD</title>
+    
+    <!-- Google Fonts: Plus Jakarta Sans & JetBrains Mono -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Phosphor Icons CSS -->
+    <link rel="stylesheet" type="text/css" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/bold/style.css"/>
+    <link rel="stylesheet" type="text/css" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/fill/style.css"/>
+    <link rel="stylesheet" type="text/css" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css"/>
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['"Plus Jakarta Sans"', 'system-ui', 'sans-serif'],
+                        mono: ['"JetBrains Mono"', 'monospace'],
+                    },
+                    colors: {
+                        brand: {
+                            blue: '#0e498c',       // Azul zafiro corporativo ("Pyme" y flecha superior)
+                            blueDark: '#0a3666',
+                            blueLight: '#eff6ff',
+                            cyan: '#14b6c4',       // Turquesa eléctrico ("Sync" y flecha inferior)
+                            cyanDark: '#0e8a94',
+                            cyanLight: '#e6fafc',
+                        }
+                    },
+                    boxShadow: {
+                        'canvas': '0 14px 40px -5px rgba(14, 73, 140, 0.10), 0 4px 14px -2px rgba(14, 73, 140, 0.05)',
+                        'card': '0 1px 3px 0 rgba(14, 73, 140, 0.04), 0 1px 2px -1px rgba(14, 73, 140, 0.02)',
+                        'spotlight': '0 0 22px -2px rgba(20, 182, 196, 0.20), 0 8px 24px -4px rgba(14, 73, 140, 0.12)',
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        .gradient-border-prop {
+            position: relative;
+            background: #ffffff;
+            border: 1.5px solid transparent;
+            background-clip: padding-box;
+        }
+        .gradient-border-prop::before {
+            content: '';
+            position: absolute;
+            inset: -1.5px;
+            z-index: -1;
+            border-radius: inherit;
+            background: linear-gradient(135deg, #0e498c 0%, #14b6c4 100%);
+        }
+    </style>
+</head>
+<body class="bg-slate-900 font-sans text-slate-800 antialiased min-h-screen xl:h-screen flex flex-col items-center justify-center p-2 sm:p-3 selection:bg-brand-cyan/20 selection:text-brand-blue">
+
+    <!-- Lienzo Principal (1440 x 860 en relación 16:9 perfecta) -->
+    <div class="canvas-wrapper bg-slate-100/95 w-full max-w-[1440px] xl:h-[860px] rounded-2xl flex flex-col p-3 shadow-canvas border border-slate-200/90 relative overflow-hidden">
+        
+        <!-- Header Corporativo Oficial -->
+        <header class="flex items-center justify-between bg-white px-4 py-2 rounded-xl shadow-card border border-slate-200/70 shrink-0 mb-2 relative overflow-hidden">
+            <div class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-brand-blue via-brand-cyan to-brand-blue"></div>
+            
+            <!-- Logo Horizontal Oficial + Eslogan -->
+            <div class="flex items-center gap-3.5">
+                <img src="logo_horizontal_clean.png" alt="PymeSync" class="h-8.5 md:h-9 w-auto object-contain">
+                
+                <div class="border-l-2 border-brand-cyan/40 pl-3">
+                    <div class="flex items-center gap-2">
+                        <span class="text-xs md:text-sm font-extrabold text-brand-blue tracking-wider uppercase font-mono">
+                            «Tu tiendita, bien chidita»
+                        </span>
+                        <span class="px-2 py-0.2 rounded bg-brand-cyanLight text-brand-cyanDark text-[10px] font-bold border border-brand-cyan/30">
+                            SaaS B2B
+                        </span>
+                        <span class="hidden sm:inline-block px-1.5 py-0.2 rounded bg-slate-100 text-slate-600 text-[10px] font-semibold border border-slate-200">
+                            SCIAN 541510
+                        </span>
+                    </div>
+                    <p class="text-[10.5px] text-slate-500 font-medium">
+                        Plataforma de gestión comercial · S. de R.L. de C.V.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Título y Metadatos Institucionales -->
+            <div class="text-right">
+                <h2 class="text-sm md:text-base font-bold text-brand-blue leading-tight">
+                    Business Model Canvas
+                </h2>
+                <p class="text-[10px] font-medium text-slate-400">
+                    Equipo 3 · ISC 9° B · Universidad Autónoma de Aguascalientes
+                </p>
+            </div>
+        </header>
+
+        <!-- Canvas Grid (10 columnas x 3 filas con distribución perfecta de espacio) -->
+        <main class="flex-grow grid grid-cols-1 md:grid-cols-2 lg:grid-cols-10 lg:grid-rows-[1.05fr_1.05fr_0.9fr] gap-2 min-h-0">
+            
+            <!-- ============================================================== -->
+            <!-- 1. SOCIOS CLAVE (3 Sub-bloques Equilibrados, Cero Vacíos)       -->
+            <!-- ============================================================== -->
+            <div class="canvas-card lg:col-span-2 lg:row-span-2 bg-white rounded-xl shadow-card border border-slate-200/80 p-2.5 flex flex-col justify-between overflow-hidden">
+                <div class="flex items-center justify-between border-b border-slate-100 pb-1 shrink-0">
+                    <div class="flex items-center gap-1.5">
+                        <div class="w-5 h-5 rounded-md bg-brand-blueLight text-brand-blue flex items-center justify-center font-bold">
+                            <i class="ph-bold ph-handshake text-xs"></i>
+                        </div>
+                        <h3 class="font-bold text-xs text-brand-blue">Socios Clave</h3>
+                    </div>
+                    <span class="text-[9px] font-bold text-brand-blue bg-brand-blueLight px-1.5 py-0.5 rounded">Alianzas</span>
+                </div>
+
+                <div class="flex-grow flex flex-col justify-between py-1 gap-1.5">
+                    <!-- Bloque A: Tracción Comunitaria y Expansión -->
+                    <div class="p-2 rounded-lg bg-slate-50 border border-slate-100 space-y-1">
+                        <p class="text-[10px] font-bold text-brand-blue flex items-center gap-1">
+                            <i class="ph-fill ph-users-three text-brand-cyanDark text-xs"></i>
+                            <span>Tracción & Expansión Comercial</span>
+                        </p>
+                        <ul class="text-[9.5px] text-slate-700 space-y-0.5 leading-snug">
+                            <li class="flex items-start gap-1.5">
+                                <i class="ph-fill ph-check-circle text-brand-blue shrink-0 mt-0.5 text-xs"></i>
+                                <span><strong class="text-slate-900 font-bold">Tenderos Referidores:</strong> Motor viral con 20% de altas nuevas mensuales (boca a boca).</span>
+                            </li>
+                            <li class="flex items-start gap-1.5">
+                                <i class="ph-fill ph-check-circle text-brand-blue shrink-0 mt-0.5 text-xs"></i>
+                                <span><strong class="text-slate-900 font-bold">Comercio Mayorista:</strong> Alianzas locales para homologar y precargar catálogos.</span>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- Bloque B: Financiamiento y Gobernanza -->
+                    <div class="p-2 rounded-lg bg-brand-cyanLight/40 border border-brand-cyan/20 space-y-1">
+                        <p class="text-[10px] font-bold text-brand-blue flex items-center gap-1">
+                            <i class="ph-fill ph-bank text-brand-cyanDark text-xs"></i>
+                            <span>Financiamiento & Academia</span>
+                        </p>
+                        <ul class="text-[9.5px] text-slate-700 space-y-0.5 leading-snug">
+                            <li class="flex items-start gap-1.5">
+                                <i class="ph-fill ph-check-circle text-brand-cyanDark shrink-0 mt-0.5 text-xs"></i>
+                                <span><strong class="text-slate-900 font-bold">SIFIA (Gobierno Ags.):</strong> 72.73% del capital inicial ($160k a 5 años, tasa blanda).</span>
+                            </li>
+                            <li class="flex items-start gap-1.5">
+                                <i class="ph-fill ph-check-circle text-brand-cyanDark shrink-0 mt-0.5 text-xs"></i>
+                                <span><strong class="text-slate-900 font-bold">UAA (ISC):</strong> Incubación institucional, validación técnica y metodológica.</span>
+                            </li>
+                            <li class="flex items-start gap-1.5">
+                                <i class="ph-fill ph-check-circle text-brand-cyanDark shrink-0 mt-0.5 text-xs"></i>
+                                <span><strong class="text-slate-900 font-bold">Mentores Sinodales:</strong> Acompañamiento en modelo B2B y finanzas.</span>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- Bloque C: Proveedores Tecnológicos y Soporte -->
+                    <div class="p-2 rounded-lg bg-slate-50 border border-slate-100 space-y-1">
+                        <p class="text-[10px] font-bold text-brand-blue flex items-center gap-1">
+                            <i class="ph-fill ph-cloud text-brand-blue text-xs"></i>
+                            <span>Infraestructura & Soporte Externo</span>
+                        </p>
+                        <ul class="text-[9.5px] text-slate-700 space-y-0.5 leading-snug">
+                            <li class="flex items-start gap-1.5">
+                                <i class="ph-fill ph-check-circle text-brand-blue shrink-0 mt-0.5 text-xs"></i>
+                                <span><strong class="text-slate-900 font-bold">Proveedores Cloud:</strong> Servidores VPS DigitalOcean y bases PostgreSQL.</span>
+                            </li>
+                            <li class="flex items-start gap-1.5">
+                                <i class="ph-fill ph-check-circle text-brand-blue shrink-0 mt-0.5 text-xs"></i>
+                                <span><strong class="text-slate-900 font-bold">Mensajería API:</strong> Twilio y Meta WhatsApp API para notificaciones de corte.</span>
+                            </li>
+                            <li class="flex items-start gap-1.5">
+                                <i class="ph-fill ph-check-circle text-brand-blue shrink-0 mt-0.5 text-xs"></i>
+                                <span><strong class="text-slate-900 font-bold">Asesoría Contable:</strong> Despacho externo para cumplimiento fiscal SAT y legal.</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="pt-1 border-t border-slate-100 flex items-center justify-between text-[9px] text-slate-400 shrink-0">
+                    <span>Ecosistema</span>
+                    <span class="font-semibold text-brand-blue">Tracción + Capital + Cloud</span>
+                </div>
+            </div>
+
+            <!-- ============================================================== -->
+            <!-- 2. ACTIVIDADES CLAVE (Distribución Uniforme)                    -->
+            <!-- ============================================================== -->
+            <div class="canvas-card lg:col-span-2 lg:row-span-1 lg:col-start-3 lg:row-start-1 bg-white rounded-xl shadow-card border border-slate-200/80 p-2.5 flex flex-col justify-between overflow-hidden">
+                <div class="flex items-center justify-between border-b border-slate-100 pb-1 shrink-0">
+                    <div class="flex items-center gap-1.5">
+                        <div class="w-5 h-5 rounded-md bg-brand-cyanLight text-brand-cyanDark flex items-center justify-center font-bold">
+                            <i class="ph-bold ph-gear text-xs"></i>
+                        </div>
+                        <h3 class="font-bold text-xs text-brand-blue">Actividades Clave</h3>
+                    </div>
+                    <span class="text-[9px] font-bold text-brand-cyanDark bg-brand-cyanLight px-1.5 py-0.5 rounded">Operación</span>
+                </div>
+
+                <div class="flex-grow flex flex-col justify-around py-1">
+                    <div class="flex items-start gap-1.5">
+                        <i class="ph-fill ph-caret-right text-brand-cyan shrink-0 mt-0.5 text-xs"></i>
+                        <span class="text-[10px] text-slate-700 leading-snug"><strong class="text-slate-900 font-bold">Desarrollo Software:</strong> Módulos de caja, inventarios con caducidades, fiados y base SQLite offline.</span>
+                    </div>
+                    <div class="flex items-start gap-1.5">
+                        <i class="ph-fill ph-caret-right text-brand-cyan shrink-0 mt-0.5 text-xs"></i>
+                        <span class="text-[10px] text-slate-700 leading-snug"><strong class="text-slate-900 font-bold">Operaciones Cloud 24/7:</strong> Monitoreo de VPS, respaldos continuos y sincronización bidireccional.</span>
+                    </div>
+                    <div class="flex items-start gap-1.5">
+                        <i class="ph-fill ph-caret-right text-brand-cyan shrink-0 mt-0.5 text-xs"></i>
+                        <span class="text-[10px] text-slate-700 leading-snug"><strong class="text-slate-900 font-bold">Venta Directa en Campo:</strong> Rutas de cambaceo, visitas en frío y demostraciones en 3 anillos de Ags.</span>
+                    </div>
+                    <div class="flex items-start gap-1.5">
+                        <i class="ph-fill ph-caret-right text-brand-cyan shrink-0 mt-0.5 text-xs"></i>
+                        <span class="text-[10px] text-slate-700 leading-snug"><strong class="text-slate-900 font-bold">Onboarding & Soporte:</strong> Capacitación en mostrador y mesa de ayuda técnica directa (&lt;24h resolución).</span>
+                    </div>
+                </div>
+
+                <div class="pt-1 border-t border-slate-100 flex items-center justify-between text-[9px] text-slate-400 shrink-0">
+                    <span>DevOps + Campo</span>
+                    <span class="font-semibold text-brand-cyanDark">Respuesta &lt; 24h</span>
+                </div>
+            </div>
+
+            <!-- ============================================================== -->
+            <!-- 6. RECURSOS CLAVE (Distribución Uniforme)                      -->
+            <!-- ============================================================== -->
+            <div class="canvas-card lg:col-span-2 lg:row-span-1 lg:col-start-3 lg:row-start-2 bg-white rounded-xl shadow-card border border-slate-200/80 p-2.5 flex flex-col justify-between overflow-hidden">
+                <div class="flex items-center justify-between border-b border-slate-100 pb-1 shrink-0">
+                    <div class="flex items-center gap-1.5">
+                        <div class="w-5 h-5 rounded-md bg-brand-blueLight text-brand-blue flex items-center justify-center font-bold">
+                            <i class="ph-bold ph-database text-xs"></i>
+                        </div>
+                        <h3 class="font-bold text-xs text-brand-blue">Recursos Clave</h3>
+                    </div>
+                    <span class="text-[9px] font-bold text-brand-blue bg-brand-blueLight px-1.5 py-0.5 rounded">Capacidades</span>
+                </div>
+
+                <div class="flex-grow flex flex-col justify-around py-1">
+                    <div class="flex items-start gap-1.5">
+                        <i class="ph-fill ph-caret-right text-brand-blue shrink-0 mt-0.5 text-xs"></i>
+                        <span class="text-[10px] text-slate-700 leading-snug"><strong class="text-slate-900 font-bold">Capital Humano:</strong> 6 Ing. en Sistemas cubriendo 9 puestos operativos (Nómina inicial $0 en Año 1).</span>
+                    </div>
+                    <div class="flex items-start gap-1.5">
+                        <i class="ph-fill ph-caret-right text-brand-blue shrink-0 mt-0.5 text-xs"></i>
+                        <span class="text-[10px] text-slate-700 leading-snug"><strong class="text-slate-900 font-bold">Stack Tecnológico:</strong> Node.js, PostgreSQL en nube, SQLite local y WhatsApp Business API.</span>
+                    </div>
+                    <div class="flex items-start gap-1.5">
+                        <i class="ph-fill ph-caret-right text-brand-blue shrink-0 mt-0.5 text-xs"></i>
+                        <span class="text-[10px] text-slate-700 leading-snug"><strong class="text-slate-900 font-bold">Activos Físicos ($172.6k):</strong> 3 laptops dev 16GB RAM, 6 de oficina y smartphones de prueba.</span>
+                    </div>
+                    <div class="flex items-start gap-1.5">
+                        <i class="ph-fill ph-caret-right text-brand-blue shrink-0 mt-0.5 text-xs"></i>
+                        <span class="text-[10px] text-slate-700 leading-snug"><strong class="text-slate-900 font-bold">Financieros ($220k):</strong> $160k crédito institucional SIFIA (5 años) + $60k aportación socios.</span>
+                    </div>
+                </div>
+
+                <div class="pt-1 border-t border-slate-100 flex items-center justify-between text-[9px] text-slate-400 shrink-0">
+                    <span>Activos & Equipo</span>
+                    <span class="font-semibold text-slate-700 font-mono">$220k Inversión</span>
+                </div>
+            </div>
+
+            <!-- ============================================================== -->
+            <!-- 3. PROPUESTA DE VALOR (Cero Papel al Centro, Relleno Armónico)  -->
+            <!-- ============================================================== -->
+            <div class="canvas-card lg:col-span-2 lg:row-span-2 lg:col-start-5 lg:row-start-1 gradient-border-prop rounded-xl shadow-spotlight p-2.5 flex flex-col justify-between overflow-hidden relative">
+                <!-- Encabezado Destacado -->
+                <div class="flex items-center justify-between border-b border-slate-100 pb-1 shrink-0">
+                    <div class="flex items-center gap-1.5">
+                        <div class="w-5 h-5 rounded-md bg-gradient-to-tr from-brand-blue to-brand-cyan text-white flex items-center justify-center font-bold">
+                            <i class="ph-bold ph-gift text-xs"></i>
+                        </div>
+                        <h3 class="font-extrabold text-xs text-brand-blue">Propuesta de Valor</h3>
+                    </div>
+                    <span class="text-[9px] font-bold text-white bg-brand-cyanDark px-2 py-0.5 rounded-full uppercase tracking-wider">
+                        Núcleo
+                    </span>
+                </div>
+
+                <div class="flex-grow flex flex-col justify-between py-1 gap-1">
+                    <!-- Diferenciador Central Destacado: Paperless -->
+                    <div class="p-2 rounded-lg bg-brand-cyanLight/70 border border-brand-cyan/30">
+                        <div class="flex items-center gap-1.5 text-brand-blue font-bold text-xs mb-0.5">
+                            <i class="ph-fill ph-leaf text-brand-cyanDark text-sm"></i>
+                            <span>Filosofía Paperless (Cero Papel)</span>
+                        </div>
+                        <p class="text-[9.5px] text-slate-600 leading-tight">
+                            Digitalización ecológica del comercio tradicional: erradica libretas de papel, notas extraviadas y pérdidas por cálculos manuales.
+                        </p>
+                    </div>
+
+                    <!-- 4 Pilares Funcionales Esenciales -->
+                    <ul class="text-[10px] text-slate-700 space-y-1 font-medium">
+                        <li class="flex items-start gap-1.5">
+                            <div class="w-4 h-4 rounded-full bg-brand-blueLight text-brand-blue flex items-center justify-center shrink-0 mt-0.5 font-bold">
+                                <i class="ph-bold ph-check text-[9px]"></i>
+                            </div>
+                            <span class="leading-tight">
+                                <strong class="text-slate-900 font-bold">POS Integral:</strong> Cobro ágil, inventario con semáforo de caducidades, caja y fiados.
+                            </span>
+                        </li>
+
+                        <li class="flex items-start gap-1.5">
+                            <div class="w-4 h-4 rounded-full bg-brand-cyanLight text-brand-cyanDark flex items-center justify-center shrink-0 mt-0.5 font-bold">
+                                <i class="ph-bold ph-wifi-slash text-[9px]"></i>
+                            </div>
+                            <span class="leading-tight">
+                                <strong class="text-slate-900 font-bold">100% Offline:</strong> Operación continua sin internet con base local SQLite y sync automática.
+                            </span>
+                        </li>
+
+                        <li class="flex items-start gap-1.5">
+                            <div class="w-4 h-4 rounded-full bg-brand-blueLight text-brand-blue flex items-center justify-center shrink-0 mt-0.5 font-bold">
+                                <i class="ph-bold ph-lightning text-[9px]"></i>
+                            </div>
+                            <span class="leading-tight">
+                                <strong class="text-slate-900 font-bold">Curva Cero:</strong> Diseñada en español para comerciantes sin experiencia tecnológica.
+                            </span>
+                        </li>
+
+                        <li class="flex items-start gap-1.5">
+                            <div class="w-4 h-4 rounded-full bg-brand-cyanLight text-brand-cyanDark flex items-center justify-center shrink-0 mt-0.5 font-bold">
+                                <i class="ph-bold ph-whatsapp-logo text-[9px]"></i>
+                            </div>
+                            <span class="leading-tight">
+                                <strong class="text-slate-900 font-bold">Alertas WhatsApp:</strong> Resúmenes diarios de venta y cortes automáticos al celular.
+                            </span>
+                        </li>
+                    </ul>
+
+                    <!-- Ventaja Competitiva vs Competencia -->
+                    <div class="p-2 rounded-lg bg-slate-50 border border-slate-200/60 space-y-0.5">
+                        <p class="text-[9.5px] font-bold text-brand-blue flex items-center gap-1">
+                            <i class="ph-fill ph-shield-check text-brand-cyanDark text-xs"></i>
+                            <span>Ventaja Local vs. Competencia (Loyverse / Alegra)</span>
+                        </p>
+                        <p class="text-[9px] text-slate-600 leading-tight">
+                            • Catálogo abarrotero precargado y control especializado de fiados.<br>
+                            • Acompañamiento presencial en sitio y soporte local en Aguascalientes.
+                        </p>
+                    </div>
+
+                    <!-- Sub-badge Limpio de Prueba Gratuita -->
+                    <div class="p-1.5 rounded-lg bg-brand-blueLight/60 border border-brand-blue/15 text-center">
+                        <p class="text-[10px] text-brand-blue font-bold">
+                            Acceso Libre: <span class="font-normal text-slate-700">15 días gratis sin tarjeta ni plazos forzosos</span>
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ============================================================== -->
+            <!-- COLUMNA 7-8: RELACIÓN (Ampliada) + CANALES (Ultra-Compacto)    -->
+            <!-- ============================================================== -->
+            <div class="lg:col-span-2 lg:row-span-2 lg:col-start-7 lg:row-start-1 flex flex-col gap-2 min-h-0">
+                
+                <!-- 4. RELACIÓN CON CLIENTES (Aprovecha el espacio liberado por Canales) -->
+                <div class="canvas-card flex-[1.4] bg-white rounded-xl shadow-card border border-slate-200/80 p-2.5 flex flex-col justify-between overflow-hidden">
+                    <div class="flex items-center justify-between border-b border-slate-100 pb-1 shrink-0">
+                        <div class="flex items-center gap-1.5">
+                            <div class="w-5 h-5 rounded-md bg-brand-blueLight text-brand-blue flex items-center justify-center font-bold">
+                                <i class="ph-bold ph-heart text-xs"></i>
+                            </div>
+                            <h3 class="font-bold text-xs text-brand-blue">Relación Clientes</h3>
+                        </div>
+                        <span class="text-[9px] font-bold text-brand-blue bg-brand-blueLight px-1.5 py-0.5 rounded">Fidelización</span>
+                    </div>
+
+                    <div class="flex-grow flex flex-col justify-between py-1 gap-1">
+                        <!-- Bloque 1: Acompañamiento y Soporte -->
+                        <div class="p-2 rounded-lg bg-slate-50 border border-slate-100 space-y-1">
+                            <p class="text-[9.5px] font-bold text-brand-blue flex items-center gap-1">
+                                <i class="ph-fill ph-headset text-brand-cyanDark text-xs"></i>
+                                <span>Atención Directa & Onboarding</span>
+                            </p>
+                            <ul class="text-[9.5px] text-slate-700 space-y-0.5 leading-snug">
+                                <li class="flex items-start gap-1.5">
+                                    <i class="ph-fill ph-check-circle text-brand-cyan shrink-0 mt-0.5 text-xs"></i>
+                                    <span><strong class="text-slate-900 font-bold">Onboarding Presencial:</strong> Configuración inicial y catálogo en sitio.</span>
+                                </li>
+                                <li class="flex items-start gap-1.5">
+                                    <i class="ph-fill ph-check-circle text-brand-cyan shrink-0 mt-0.5 text-xs"></i>
+                                    <span><strong class="text-slate-900 font-bold">Mesa de Ayuda WhatsApp:</strong> Soporte directo con resolución &lt; 24h.</span>
+                                </li>
+                                <li class="flex items-start gap-1.5">
+                                    <i class="ph-fill ph-check-circle text-brand-cyan shrink-0 mt-0.5 text-xs"></i>
+                                    <span><strong class="text-slate-900 font-bold">Acompañamiento:</strong> Visitas mensuales de adopción y mejoras de uso.</span>
+                                </li>
+                            </ul>
+                        </div>
+
+                        <!-- Bloque 2: Lealtad y Libertad -->
+                        <div class="p-2 rounded-lg bg-brand-cyanLight/40 border border-brand-cyan/20 space-y-1">
+                            <p class="text-[9.5px] font-bold text-brand-blue flex items-center gap-1">
+                                <i class="ph-fill ph-gift text-brand-cyanDark text-xs"></i>
+                                <span>Transparencia & Tracción Viral</span>
+                            </p>
+                            <ul class="text-[9.5px] text-slate-700 space-y-0.5 leading-snug">
+                                <li class="flex items-start gap-1.5">
+                                    <i class="ph-fill ph-check-circle text-brand-cyanDark shrink-0 mt-0.5 text-xs"></i>
+                                    <span><strong class="text-slate-900 font-bold">Sin Ataduras:</strong> Cancelación libre sin penalización y exportación en 1 clic.</span>
+                                </li>
+                                <li class="flex items-start gap-1.5">
+                                    <i class="ph-fill ph-check-circle text-brand-cyanDark shrink-0 mt-0.5 text-xs"></i>
+                                    <span><strong class="text-slate-900 font-bold">Incentivo Referidos:</strong> 1 mes gratis por cada negocio recomendado activo.</span>
+                                </li>
+                                <li class="flex items-start gap-1.5">
+                                    <i class="ph-fill ph-check-circle text-brand-cyanDark shrink-0 mt-0.5 text-xs"></i>
+                                    <span><strong class="text-slate-900 font-bold">Comunidad & Feedback:</strong> Encuestas de satisfacción y mejoras continuas.</span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="pt-1 border-t border-slate-100 flex items-center justify-between text-[9px] text-slate-400 shrink-0">
+                        <span>Atención Cercana</span>
+                        <span class="font-semibold text-brand-blue">Resolución &lt; 24h</span>
+                    </div>
+                </div>
+
+                <!-- 7. CANALES (El Más Compacto, 3 Puntos Estrictos Sin Redundancias) -->
+                <div class="canvas-card flex-[0.7] bg-white rounded-xl shadow-card border border-slate-200/80 p-2 flex flex-col justify-between overflow-hidden">
+                    <div class="flex items-center justify-between border-b border-slate-100 pb-0.5 mb-1 shrink-0">
+                        <div class="flex items-center gap-1.5">
+                            <div class="w-4 h-4 rounded-md bg-brand-cyanLight text-brand-cyanDark flex items-center justify-center font-bold">
+                                <i class="ph-bold ph-share-network text-[11px]"></i>
+                            </div>
+                            <h3 class="font-bold text-xs text-brand-blue">Canales</h3>
+                        </div>
+                        <span class="text-[8.5px] font-bold text-brand-cyanDark bg-brand-cyanLight px-1.5 py-0.2 rounded">Compacto</span>
+                    </div>
+
+                    <!-- 3 Puntos Estrictos Sin Redundancias -->
+                    <div class="flex-grow flex flex-col justify-around py-0.5 text-[9.5px] text-slate-700">
+                        <div class="flex items-start gap-1">
+                            <i class="ph-fill ph-caret-right text-brand-cyan shrink-0 mt-0.5 text-[10px]"></i>
+                            <span class="leading-tight"><strong class="text-slate-900 font-bold">Venta Directa:</strong> Cambaceo y demos en 3 anillos de Aguascalientes.</span>
+                        </div>
+                        <div class="flex items-start gap-1">
+                            <i class="ph-fill ph-caret-right text-brand-cyan shrink-0 mt-0.5 text-[10px]"></i>
+                            <span class="leading-tight"><strong class="text-slate-900 font-bold">Pauta Digital:</strong> Campañas geolocalizadas (Meta Ads y Google Ads).</span>
+                        </div>
+                        <div class="flex items-start gap-1">
+                            <i class="ph-fill ph-caret-right text-brand-cyan shrink-0 mt-0.5 text-[10px]"></i>
+                            <span class="leading-tight"><strong class="text-slate-900 font-bold">Web App:</strong> Plataforma SaaS multidispositivo en PC y Android.</span>
+                        </div>
+                    </div>
+
+                    <div class="pt-0.5 border-t border-slate-100 flex items-center justify-between text-[8.5px] text-slate-400 shrink-0">
+                        <span>Distribución</span>
+                        <span class="font-semibold text-slate-700">Digital + Campo</span>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- ============================================================== -->
+            <!-- 5. SEGMENTOS DE CLIENTES (Equilibrado, 4 Bloques, Cero Vacíos) -->
+            <!-- ============================================================== -->
+            <div class="canvas-card lg:col-span-2 lg:row-span-2 lg:col-start-9 lg:row-start-1 bg-white rounded-xl shadow-card border border-slate-200/80 p-2.5 flex flex-col justify-between overflow-hidden">
+                <div class="flex items-center justify-between border-b border-slate-100 pb-1 shrink-0">
+                    <div class="flex items-center gap-1.5">
+                        <div class="w-5 h-5 rounded-md bg-slate-100 text-brand-blue flex items-center justify-center font-bold">
+                            <i class="ph-bold ph-users-three text-xs"></i>
+                        </div>
+                        <h3 class="font-bold text-xs text-brand-blue">Segmentos Clave</h3>
+                    </div>
+                    <span class="text-[9px] font-bold text-slate-700 bg-slate-100 px-1.5 py-0.5 rounded">Mercado</span>
+                </div>
+
+                <div class="flex-grow flex flex-col justify-between py-1 gap-1">
+                    <!-- Target Principal -->
+                    <div class="p-2 rounded-lg bg-slate-50 border border-slate-200/60 space-y-0.5">
+                        <div class="flex items-center gap-1.5">
+                            <i class="ph-fill ph-storefront text-brand-blue text-xs shrink-0"></i>
+                            <strong class="text-[10px] text-slate-900 font-bold">Abarrotes y Micronegocios</strong>
+                        </div>
+                        <p class="leading-tight text-slate-600 text-[9px]">
+                            • Tiendas familiares (0-5 empleados) con administración en libreta.<br>
+                            • Pérdidas por merma, caducidad no vista y fiados no cobrados.
+                        </p>
+                    </div>
+
+                    <!-- Target Secundario -->
+                    <div class="p-2 rounded-lg bg-slate-50 border border-slate-200/60 space-y-0.5">
+                        <div class="flex items-center gap-1.5">
+                            <i class="ph-fill ph-shopping-bag text-brand-cyanDark text-xs shrink-0"></i>
+                            <strong class="text-[10px] text-slate-900 font-bold">Comercios con Alta Rotación</strong>
+                        </div>
+                        <p class="leading-tight text-slate-600 text-[9px]">
+                            • Cremerías, carnicerías y misceláneas con venta a granel.<br>
+                            • Necesidad urgente de arqueo diario de caja y pesaje ágil.
+                        </p>
+                    </div>
+
+                    <!-- Microdato Cuantificado del Mercado -->
+                    <div class="p-2 rounded-lg bg-brand-cyanLight/70 border border-brand-cyan/20 space-y-0.5">
+                        <div class="flex items-center gap-1.5 text-brand-blue font-bold text-[9.5px]">
+                            <i class="ph-fill ph-chart-pie-slice text-brand-cyanDark text-xs"></i>
+                            <span>Mercado Cuantificado (INEGI 2024)</span>
+                        </div>
+                        <p class="leading-tight text-slate-600 text-[9px]">
+                            • <strong>3,325 establecimientos</strong> registrados en Aguascalientes.<br>
+                            • <strong>99.3% microempresas</strong> (0 a 5 trabajadores).<br>
+                            • <strong>&gt;85% sin software</strong> de punto de venta formal.
+                        </p>
+                    </div>
+
+                    <!-- Metas de Crecimiento del Plan -->
+                    <div class="p-1.5 rounded-lg bg-slate-50 border border-slate-100 text-[9px] space-y-0.5">
+                        <div class="flex justify-between items-center text-slate-600">
+                            <span>• Meta Año 1 (Mes 12):</span>
+                            <span class="font-bold text-brand-blue font-mono">100 clientes</span>
+                        </div>
+                        <div class="flex justify-between items-center text-slate-500">
+                            <span>• Expansión Años 2 y 3:</span>
+                            <span class="font-semibold text-slate-700 font-mono">184 y 345 clientes</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="pt-1 border-t border-slate-100 flex items-center justify-between text-[9px] text-slate-400 shrink-0">
+                    <span>Población Objetivo</span>
+                    <span class="font-semibold text-brand-blue">3,325 Establecimientos</span>
+                </div>
+            </div>
+
+            <!-- ============================================================== -->
+            <!-- 8. ESTRUCTURA DE COSTOS (Completo, Sin Desbordes y Sin Vacíos) -->
+            <!-- ============================================================== -->
+            <div class="canvas-card lg:col-span-5 lg:row-span-1 lg:col-start-1 lg:row-start-3 bg-white rounded-xl shadow-card border border-slate-200/80 p-2.5 flex flex-col justify-between overflow-hidden">
+                <div class="flex items-center justify-between border-b border-slate-100 pb-1 shrink-0">
+                    <div class="flex items-center gap-1.5">
+                        <div class="w-5 h-5 rounded-md bg-brand-blueLight text-brand-blue flex items-center justify-center font-bold">
+                            <i class="ph-bold ph-receipt text-xs"></i>
+                        </div>
+                        <h3 class="font-bold text-xs text-brand-blue">Estructura de Costos</h3>
+                    </div>
+                    <span class="text-[9px] font-bold text-brand-blue bg-brand-blueLight px-2 py-0.5 rounded">
+                        Costos Clave
+                    </span>
+                </div>
+
+                <div class="flex-grow grid grid-cols-2 gap-2.5 py-1 text-[10px]">
+                    <!-- Columna 1: Costos Fijos Operativos -->
+                    <div class="p-2.5 rounded-lg bg-slate-50 border border-slate-100 flex flex-col justify-between">
+                        <div class="font-bold text-brand-blue text-[10px] flex items-center justify-between border-b border-slate-200/50 pb-0.5">
+                            <span>Costos Fijos Operativos (Sin Nómina)</span>
+                            <span class="font-mono text-slate-600">$5,600/m</span>
+                        </div>
+                        <ul class="text-[9.5px] text-slate-600 space-y-0.5 leading-snug">
+                            <li>• Servidor VPS en la nube y bases de datos ($600/m).</li>
+                            <li>• Licencias de software, dominio y correos corporativos.</li>
+                            <li>• Asesoría externa contable, fiscal y legal ($1,500/m).</li>
+                            <li class="text-brand-blue font-semibold">• Nómina año 1: $0 (6 socios fundadores cubren 9 plazas).</li>
+                        </ul>
+                    </div>
+
+                    <!-- Columna 2: Deuda SIFIA y Costos Variables -->
+                    <div class="p-2.5 rounded-lg bg-slate-50 border border-slate-100 flex flex-col justify-between">
+                        <div class="font-bold text-brand-blue text-[10px] flex items-center justify-between border-b border-slate-200/50 pb-0.5">
+                            <span>Deuda SIFIA & Costos Variables</span>
+                            <span class="font-mono text-slate-600">$30.1k Deuda / $7 API</span>
+                        </div>
+                        <ul class="text-[9.5px] text-slate-600 space-y-0.5 leading-snug">
+                            <li>• Servicio de deuda crédito SIFIA ($30,149.51 año 1 / a 60m).</li>
+                            <li>• WhatsApp API por suscriptor ($7.00/cliente activo/mes).</li>
+                            <li>• Publicidad digital en Meta y Google Ads ($1,500/mes).</li>
+                            <li>• Viáticos para cambaceo y visitas comerciales en campo.</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="pt-1 border-t border-slate-100 flex items-center justify-between text-[9px] text-slate-500 shrink-0">
+                    <span>Enfoque: <strong class="text-slate-700">Costos operativos de caja + Deuda SIFIA</strong></span>
+                    <span class="font-semibold text-brand-blue font-mono">Arranque sin nómina fija</span>
+                </div>
+            </div>
+
+            <!-- ============================================================== -->
+            <!-- 9. FUENTES DE INGRESOS (Completo, Sin Desbordes y Sin Vacíos)  -->
+            <!-- ============================================================== -->
+            <div class="canvas-card lg:col-span-5 lg:row-span-1 lg:col-start-6 lg:row-start-3 bg-white rounded-xl shadow-card border border-slate-200/80 p-2.5 flex flex-col justify-between overflow-hidden">
+                <div class="flex items-center justify-between border-b border-slate-100 pb-1 shrink-0">
+                    <div class="flex items-center gap-1.5">
+                        <div class="w-5 h-5 rounded-md bg-brand-cyanLight text-brand-cyanDark flex items-center justify-center font-bold">
+                            <i class="ph-bold ph-coins text-xs"></i>
+                        </div>
+                        <h3 class="font-bold text-xs text-brand-blue">Fuentes de Ingresos</h3>
+                    </div>
+                    <span class="text-[9px] font-bold text-brand-cyanDark bg-brand-cyanLight px-2 py-0.5 rounded">
+                        Suscripción Escalonada
+                    </span>
+                </div>
+
+                <div class="flex-grow grid grid-cols-2 gap-2.5 py-1 text-[10px]">
+                    <!-- Columna 1: Esquema Escalonado -->
+                    <div class="p-2.5 rounded-lg bg-slate-50 border border-slate-100 flex flex-col justify-between">
+                        <div class="font-bold text-brand-blue text-[10px] flex items-center justify-between border-b border-slate-200/50 pb-0.5">
+                            <span>Esquema Escalonado</span>
+                            <span class="text-brand-cyanDark font-mono font-bold">$149 ➔ $299</span>
+                        </div>
+                        <ul class="space-y-0.5 text-slate-600 text-[9.5px] leading-snug">
+                            <li>• <strong>Prueba Gratuita:</strong> 15 días completos sin compromiso.</li>
+                            <li>• <strong>Promo Inicial:</strong> $149 MXN/mes durante los primeros 6 meses.</li>
+                            <li>• <strong>Precio Regular:</strong> $299 MXN/mes por tienda (desde mes 7).</li>
+                            <li>• <strong>Descuentos por Referidos:</strong> 1 mes gratis + 50% desc.</li>
+                        </ul>
+                    </div>
+
+                    <!-- Columna 2: Equilibrio y Tracción -->
+                    <div class="p-2.5 rounded-lg bg-slate-50 border border-slate-100 flex flex-col justify-between">
+                        <div class="font-bold text-brand-blue text-[10px] flex items-center justify-between border-b border-slate-200/50 pb-0.5">
+                            <span>Equilibrio & Tracción</span>
+                            <span class="text-brand-blue font-mono font-bold">Meta: 100 Clientes</span>
+                        </div>
+                        <ul class="space-y-0.5 text-slate-600 text-[9.5px] leading-snug">
+                            <li>• <strong>Punto Equilibrio (Caja):</strong> 28 clientes de pago (Mes 4).</li>
+                            <li>• <strong>Punto Equilibrio (Contable):</strong> 43 clientes de pago (Mes 6).</li>
+                            <li>• <strong>Flujo Planificado:</strong> Absorbe pérdidas de arranque (M1 a M6).</li>
+                            <li>• <strong>Margen de Contribución:</strong> $292 MXN por cliente (97.6%).</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="pt-1 border-t border-slate-100 flex items-center justify-between text-[9px] text-slate-500 shrink-0">
+                    <span>Estrategia: <strong class="text-slate-700">Captación escalonada ($149 ➔ $299)</strong></span>
+                    <span class="font-semibold text-brand-cyanDark">Ingresos Recurrentes SaaS</span>
+                </div>
+            </div>
+
+        </main>
+
+        <!-- Footer / Cinta de Métricas Operativas Clave -->
+        <footer class="mt-2 pt-1 border-t border-slate-200/90 flex items-center justify-between gap-2 text-xs shrink-0">
+            <div class="text-slate-500 text-[10px] hidden sm:block">
+                <span class="font-bold text-slate-700">Equipo 3 (ISC · UAA):</span>
+                <span>Yahir Guevara · Jaime Cruz · Ricardo Padilla · Jesús Tapia · José Vázquez · Luis García</span>
+            </div>
+
+            <div class="flex items-center gap-1.5 font-mono text-[10px] w-full sm:w-auto justify-between sm:justify-end">
+                <span class="px-2 py-0.5 rounded bg-white border border-slate-200 text-slate-700">
+                    Financiamiento: <strong class="text-brand-blue">$220k</strong> (72.7% SIFIA · 27.3% Socios)
+                </span>
+                <span class="px-2 py-0.5 rounded bg-white border border-slate-200 text-slate-700">
+                    Punto de Equilibrio: <strong class="text-brand-blue">28 clientes</strong> (Caja M4) / <strong class="text-slate-700">43</strong> (Contable M6)
+                </span>
+                <span class="px-2 py-0.5 rounded bg-brand-cyanLight border border-brand-cyan/30 text-brand-cyanDark font-bold">
+                    Meta Año 1: 100 Clientes Activos
+                </span>
+            </div>
+        </footer>
+
+    </div>
+
+</body>
+</html>
