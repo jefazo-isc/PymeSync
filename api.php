@@ -16,6 +16,16 @@ require_once __DIR__ . '/src/Auth.php';
 require_once __DIR__ . '/src/StoreRepository.php';
 
 try {
+    if (($_GET['action'] ?? '') === 'health') {
+        $db = Database::connect();
+        $db->query('SELECT 1');
+        echo json_encode([
+            'ok' => true,
+            'status' => 'healthy',
+        ], JSON_UNESCAPED_UNICODE);
+        exit;
+    }
+
     Auth::ensureSession();
     $db = Database::connect();
     $repo = new StoreRepository($db);

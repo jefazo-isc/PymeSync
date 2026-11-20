@@ -56,3 +56,13 @@ La base de datos `data/pymesync.sqlite` se crea y puebla automáticamente la pri
 
 - **Usuario:** `admin` | **Contraseña:** `admin123` *(Rol: Administrador)*
 - **Usuario:** `caja1` | **Contraseña:** `caja123` *(Rol: Cajero)*
+
+---
+
+## ☁️ Despliegue en Render (Docker)
+
+Puedes desplegar PymeSync directamente en Render usando el Blueprint incluido ([`render.yaml`](render.yaml) + [`Dockerfile`](Dockerfile)):
+
+[![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/jefazo-isc/PymeSync)
+
+> **Nota (Plan Free):** El almacenamiento en el plan gratuito de Render es efímero; si el contenedor se reinicia o se suspende por inactividad, la base de datos SQLite (`data/pymesync.sqlite`) se recrea automáticamente con los datos demo iniciales.

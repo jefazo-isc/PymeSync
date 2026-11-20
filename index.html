@@ -331,10 +331,8 @@
     <script>
         const STORAGE_KEY = 'pymesync_store_v1';
         const SESSION_KEY = 'pymesync_session_v1';
-        const SERVER_URL_KEY = 'pymesync_php_server_url';
 
         let phpApiUrl = null;
-        let configuredServerUrl = localStorage.getItem(SERVER_URL_KEY) || 'http://localhost:8000/api.php';
 
         function formatDateTime(dateObj) {
             const d = new Date(dateObj);
@@ -1575,7 +1573,10 @@
                     errEl.classList.add('hidden');
                     showApp(res.user.nombre, res.user.rol);
                 } catch (err) {
-                    errEl.textContent = err.message || 'Usuario o contraseña incorrectos.';
+                    const isNetErr = err instanceof TypeError || /NetworkError|Failed to fetch/i.test(String(err?.message || ''));
+                    errEl.textContent = isNetErr
+                        ? 'No se pudo conectar con el servidor PHP. Verifica que esté activo o recarga la página (Ctrl+Shift+R).'
+                        : (err.message || 'Usuario o contraseña incorrectos.');
                     errEl.classList.remove('hidden');
                 }
                 return;
